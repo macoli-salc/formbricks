@@ -28,7 +28,7 @@ export function InviteEmail({
           {translateEmailText("invite_email_text_par1", locale)} {inviterName}{" "}
           {translateEmailText("invite_email_text_par2", locale)}
         </Text>
-        <EmailButton href={verifyLink} label="Join organization" />
+        <EmailButton href={verifyLink} label="Entrar na organizaçāo" />
         <EmailFooter />
       </Container>
     </EmailTemplate>
