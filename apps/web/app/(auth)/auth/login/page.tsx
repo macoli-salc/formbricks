@@ -16,7 +16,7 @@ import {
 
 export const metadata: Metadata = {
   title: "Login",
-  description: "Open-source Experience Management. Free & open source.",
+  description: "Escuta AI - Ouça seus clientes para crescer rápido com IA",
 };
 
 const Page = async () => {

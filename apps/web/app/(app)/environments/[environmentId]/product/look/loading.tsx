@@ -156,7 +156,7 @@ const Loading = () => {
       </SettingsCard>
 
       <SettingsCard
-        title="Formbricks Signature"
+        title="EscutaAI Signature"
         description="We love your support but understand if you toggle it off.">
         <div className="w-full items-center">
           <div className="pointer-events-none flex cursor-not-allowed select-none items-center space-x-2">
