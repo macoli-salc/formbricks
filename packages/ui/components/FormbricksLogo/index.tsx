@@ -4,7 +4,13 @@ interface FormbricksLogoProps {
 
 export const FormbricksLogo = ({ className }: FormbricksLogoProps) => {
   return (
-    <svg width="134" height="40" viewBox="0 0 134 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width="134"
+      height="40"
+      viewBox="0 0 134 40"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}>
       <g filter="url(#filter0_dd_1019_33137)">
         <g filter="url(#filter1_ddiii_1019_33137)">
           <path
