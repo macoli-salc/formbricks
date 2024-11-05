@@ -6,10 +6,10 @@ export const Logo = ({ className }: { className?: string }) => {
   return (
     <div>
       <div className="block dark:hidden">
-        <Image className={className} src={logoLight} alt="Formbricks Open source Forms & Surveys Logo" />
+        <Image className={className} src={logoLight} alt="EscutaAI Forms & Surveys Logo" />
       </div>
       <div className="hidden dark:block">
-        <Image className={className} src={logoDark} alt="Formbricks Open source Forms & Surveys Logo" />
+        <Image className={className} src={logoDark} alt="EscutaAI Forms & Surveys Logo" />
       </div>
     </div>
   );

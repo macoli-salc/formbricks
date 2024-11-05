@@ -280,7 +280,7 @@ const renderHtml = (options: Partial<SurveyInlineProps> & { apiHost?: string }):
   <html>
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0">
     <head>
-      <title>Formbricks WebView Survey</title>
+      <title>EscutaAI WebView Survey</title>
       <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body style="overflow: hidden; height: 100vh; display: flex; flex-direction: column; justify-content: flex-end;">
