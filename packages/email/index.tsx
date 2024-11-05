@@ -48,7 +48,7 @@ interface TEmailUser {
 }
 
 const getEmailSubject = (productName: string): string => {
-  return `${productName} User Insights - Last Week by Formbricks`;
+  return `${productName} User Insights - Last Week by EscutaAI`;
 };
 
 export const sendEmail = async (emailData: SendEmailDataProps): Promise<void> => {
@@ -69,7 +69,7 @@ export const sendEmail = async (emailData: SendEmailDataProps): Promise<void> =>
     debug: DEBUG,
   } as SMTPTransport.Options);
   const emailDefaults = {
-    from: `Formbricks <${MAIL_FROM ?? "noreply@formbricks.com"}>`,
+    from: `EscutaAI <${MAIL_FROM ?? "noreply@escuta.ai"}>`,
   };
   await transporter.sendMail({ ...emailDefaults, ...emailData });
 };
@@ -98,7 +98,7 @@ export const sendForgotPasswordEmail = async (user: TEmailUser, locale: string):
   const html = await render(ForgotPasswordEmail({ verifyLink, locale }));
   await sendEmail({
     to: user.email,
-    subject: "Reset your Formbricks password",
+    subject: "Reset your EscutaAI password",
     html,
   });
 };
@@ -107,7 +107,7 @@ export const sendPasswordResetNotifyEmail = async (user: TEmailUser): Promise<vo
   const html = await render(PasswordResetNotifyEmail({ locale: user.locale }));
   await sendEmail({
     to: user.email,
-    subject: "Your Formbricks password has been changed",
+    subject: "Your EscutaAI password has been changed",
     html,
   });
 };
@@ -131,14 +131,14 @@ export const sendInviteMemberEmail = async (
     const html = await render(OnboardingInviteEmail({ verifyLink, inviteMessage, inviterName, locale }));
     await sendEmail({
       to: email,
-      subject: `${inviterName} needs a hand setting up Formbricks.  Can you help out?`,
+      subject: `${inviterName} needs a hand setting up EscutaAI.  Can you help out?`,
       html,
     });
   } else {
     const html = await render(InviteEmail({ inviteeName, inviterName, verifyLink, locale }));
     await sendEmail({
       to: email,
-      subject: `You're invited to collaborate on Formbricks!`,
+      subject: `You're invited to collaborate on EscutaAI!`,
       html,
     });
   }
