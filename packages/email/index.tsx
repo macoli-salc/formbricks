@@ -48,7 +48,7 @@ interface TEmailUser {
 }
 
 const getEmailSubject = (productName: string): string => {
-  return `${productName} User Insights - Last Week by EscutaAI`;
+  return `${productName} Insights do Usuário - Última Semana por EscutaAI`;
 };
 
 export const sendEmail = async (emailData: SendEmailDataProps): Promise<void> => {
@@ -98,7 +98,7 @@ export const sendForgotPasswordEmail = async (user: TEmailUser, locale: string):
   const html = await render(ForgotPasswordEmail({ verifyLink, locale }));
   await sendEmail({
     to: user.email,
-    subject: "Reset your EscutaAI password",
+    subject: "Redefina sua senha do EscutaAI",
     html,
   });
 };
@@ -107,7 +107,7 @@ export const sendPasswordResetNotifyEmail = async (user: TEmailUser): Promise<vo
   const html = await render(PasswordResetNotifyEmail({ locale: user.locale }));
   await sendEmail({
     to: user.email,
-    subject: "Your EscutaAI password has been changed",
+    subject: "Sua senha do EscutaAI foi alterada",
     html,
   });
 };
@@ -131,14 +131,14 @@ export const sendInviteMemberEmail = async (
     const html = await render(OnboardingInviteEmail({ verifyLink, inviteMessage, inviterName, locale }));
     await sendEmail({
       to: email,
-      subject: `${inviterName} needs a hand setting up EscutaAI.  Can you help out?`,
+      subject: `${inviterName} precisa de ajuda para configurar o EscutaAI. Você pode ajudar?`,
       html,
     });
   } else {
     const html = await render(InviteEmail({ inviteeName, inviterName, verifyLink, locale }));
     await sendEmail({
       to: email,
-      subject: `You're invited to collaborate on EscutaAI!`,
+      subject: `Você foi convidado para colaborar no EscutaAI!`,
       html,
     });
   }
@@ -153,7 +153,7 @@ export const sendInviteAcceptedEmail = async (
   const html = await render(InviteAcceptedEmail({ inviteeName, inviterName, locale }));
   await sendEmail({
     to: email,
-    subject: `You've got a new organization member!`,
+    subject: `Você tem um novo membro na organização!`,
     html,
   });
 };
@@ -188,8 +188,8 @@ export const sendResponseFinishedEmail = async (
   await sendEmail({
     to: email,
     subject: personEmail
-      ? `${personEmail} just completed your ${survey.name} survey ✅`
-      : `A response for ${survey.name} was completed ✅`,
+      ? `${personEmail} acabou de completar sua pesquisa ${survey.name} ✅`
+      : `Uma resposta para ${survey.name} foi completada ✅`,
     replyTo: personEmail?.toString() ?? MAIL_FROM,
     html,
   });
@@ -228,7 +228,7 @@ export const sendLinkSurveyToVerifiedEmail = async (data: TLinkSurveyEmailData):
   const html = await render(LinkSurveyEmail({ surveyName, surveyLink, locale }));
   await sendEmail({
     to: data.email,
-    subject: "Your survey is ready to be filled out.",
+    subject: "Sua pesquisa está pronta para ser preenchida.",
     html,
   });
 };
