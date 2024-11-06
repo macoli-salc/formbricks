@@ -139,7 +139,7 @@ export const navigation: Array<NavGroup> = [
       { title: "Docker Setup", href: "/self-hosting/docker" },
       { title: "Migration Guide", href: "/self-hosting/migration-guide" },
       { title: "Configuration", href: "/self-hosting/configuration" },
-      { title: "Integrations", href: "/self-hosting/integrations" },
+      // { title: "Integrations", href: "/self-hosting/integrations" },
       { title: "License", href: "/self-hosting/license" },
     ],
   },
