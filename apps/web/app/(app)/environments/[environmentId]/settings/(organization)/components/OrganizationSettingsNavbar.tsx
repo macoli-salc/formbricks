@@ -46,7 +46,7 @@ export const OrganizationSettingsNavbar = ({
       label: t("common.enterprise_license"),
       href: `/environments/${environmentId}/settings/enterprise`,
       icon: <BoltIcon className="h-5 w-5" />,
-      hidden: isFormbricksCloud || isPricingDisabled,
+      hidden: true,
       current: pathname?.includes("/enterprise"),
     },
   ];
