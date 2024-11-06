@@ -96,7 +96,6 @@ export const MainNavigation = ({
   const product = products.find((product) => product.id === environment.productId);
   const { isAdmin, isOwner, isViewer } = getAccessFlags(membershipRole);
   const isOwnerOrAdmin = isAdmin || isOwner;
-  const isPricingDisabled = !isOwner && !isAdmin;
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
