@@ -220,30 +220,30 @@ export const MainNavigation = ({
       href: `/environments/${environment.id}/settings/general`,
       icon: UsersIcon,
     },
-    {
-      label: t("common.billing"),
-      href: `/environments/${environment.id}/settings/billing`,
-      hidden: !isFormbricksCloud || isPricingDisabled,
-      icon: CreditCardIcon,
-    },
-    {
-      label: t("common.license"),
-      href: `/environments/${environment.id}/settings/enterprise`,
-      hidden: isFormbricksCloud || isPricingDisabled,
-      icon: KeyIcon,
-    },
-    {
-      label: t("common.documentation"),
-      href: "https://formbricks.com/docs",
-      target: "_blank",
-      icon: ArrowUpRightIcon,
-    },
-    {
-      label: t("common.join_discord"),
-      href: "https://formbricks.com/discord",
-      target: "_blank",
-      icon: AiOutlineDiscord,
-    },
+    // {
+    //   label: t("common.billing"),
+    //   href: `/environments/${environment.id}/settings/billing`,
+    //   hidden: !isFormbricksCloud || isPricingDisabled,
+    //   icon: CreditCardIcon,
+    // },
+    // {
+    //   label: t("common.license"),
+    //   href: `/environments/${environment.id}/settings/enterprise`,
+    //   hidden: isFormbricksCloud || isPricingDisabled,
+    //   icon: KeyIcon,
+    // },
+    // {
+    //   label: t("common.documentation"),
+    //   href: "https://formbricks.com/docs",
+    //   target: "_blank",
+    //   icon: ArrowUpRightIcon,
+    // },
+    // {
+    //   label: t("common.join_discord"),
+    //   href: "https://formbricks.com/discord",
+    //   target: "_blank",
+    //   icon: AiOutlineDiscord,
+    // },
   ];
 
   useEffect(() => {

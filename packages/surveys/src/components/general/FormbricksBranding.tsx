@@ -1,10 +1,6 @@
 export const FormbricksBranding = () => {
   return (
-    <a
-      href="https://escuta.ai/lp"
-      target="_blank"
-      tabIndex={-1}
-      className="fb-my-2 fb-flex fb-justify-center">
+    <a href="https://escuta.ai/" target="_blank" tabIndex={-1} className="fb-my-2 fb-flex fb-justify-center">
       <p className="fb-text-signature fb-text-xs">
         Powered by{" "}
         <b>
