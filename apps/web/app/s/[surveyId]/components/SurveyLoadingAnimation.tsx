@@ -1,4 +1,4 @@
-import Logo from "@/images/powered-by-formbricks.svg";
+import Logo from "@/images/escuta-ai-wordmark.svg";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { cn } from "@formbricks/lib/cn";
