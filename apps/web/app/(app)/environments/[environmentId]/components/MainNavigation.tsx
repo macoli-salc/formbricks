@@ -191,13 +191,13 @@ export const MainNavigation = ({
         icon: MousePointerClick,
         isActive: pathname?.includes("/actions") || pathname?.includes("/actions"),
       },
-      {
-        name: t("common.integrations"),
-        href: `/environments/${environment.id}/integrations`,
-        icon: BlocksIcon,
-        isActive: pathname?.includes("/integrations"),
-        isHidden: isViewer,
-      },
+      // {
+      //   name: t("common.integrations"),
+      //   href: `/environments/${environment.id}/integrations`,
+      //   icon: BlocksIcon,
+      //   isActive: pathname?.includes("/integrations"),
+      //   isHidden: isViewer,
+      // },
       {
         name: t("common.configuration"),
         href: `/environments/${environment.id}/product/general`,
