@@ -5,6 +5,7 @@ import { NavigationLink } from "@/app/(app)/environments/[environmentId]/compone
 import { formbricksLogout } from "@/app/lib/formbricks";
 import EscutaAILogo from "@/images/escuta-ai-wordmark.svg";
 import {
+  ArrowUpRightIcon,
   BlendIcon,
   BlocksIcon,
   ChevronRightIcon,
@@ -32,6 +33,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { AiOutlineDiscord } from "react-icons/ai";
 import { cn } from "@formbricks/lib/cn";
 import { getAccessFlags } from "@formbricks/lib/membership/utils";
 import { capitalizeFirstLetter } from "@formbricks/lib/utils/strings";
@@ -94,6 +96,7 @@ export const MainNavigation = ({
   const product = products.find((product) => product.id === environment.productId);
   const { isAdmin, isOwner, isViewer } = getAccessFlags(membershipRole);
   const isOwnerOrAdmin = isAdmin || isOwner;
+  const isPricingDisabled = !isOwner && !isAdmin;
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -193,7 +196,7 @@ export const MainNavigation = ({
         href: `/environments/${environment.id}/integrations`,
         icon: BlocksIcon,
         isActive: pathname?.includes("/integrations"),
-        isHidden: isViewer,
+        isHidden: true,
       },
       {
         name: t("common.configuration"),
@@ -228,6 +231,20 @@ export const MainNavigation = ({
       href: `/environments/${environment.id}/settings/enterprise`,
       hidden: true,
       icon: KeyIcon,
+    },
+    {
+      label: t("common.documentation"),
+      href: "https://formbricks.com/docs",
+      hidden: true,
+      target: "_blank",
+      icon: ArrowUpRightIcon,
+    },
+    {
+      label: t("common.join_discord"),
+      href: "https://formbricks.com/discord",
+      hidden: true,
+      target: "_blank",
+      icon: AiOutlineDiscord,
     },
   ];
 
