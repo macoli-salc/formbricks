@@ -2,7 +2,7 @@ import "server-only";
 import { TUserLocale } from "@formbricks/types/user";
 import { env } from "./env";
 
-export const IS_FORMBRICKS_CLOUD = false;
+export const IS_FORMBRICKS_CLOUD = env.IS_FORMBRICKS_CLOUD === "1";
 
 // URLs
 export const WEBAPP_URL =
@@ -192,9 +192,9 @@ export enum PRODUCT_FEATURE_KEYS {
 }
 
 export enum STRIPE_PRODUCT_NAMES {
-  STARTUP = "Formbricks Startup",
-  SCALE = "Formbricks Scale",
-  ENTERPRISE = "Formbricks Enterprise",
+  STARTUP = "EscutaAI Básico",
+  SCALE = "EscutaAI Pro",
+  ENTERPRISE = "EscutaAI Enterprise",
 }
 
 export enum STRIPE_PRICE_LOOKUP_KEYS {
