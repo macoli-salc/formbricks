@@ -1685,6 +1685,9 @@
         "all_industries": "All industries",
         "all_roles": "All roles",
         "create_a_new_survey": "Create a new survey",
+        "formbricks_ai_description": "Teste",
+        "formbricks_ai_generate": "Gerar pesquisa",
+        "formbricks_ai_prompt_placeholder": "Aqui vai o prompt",
         "multiple_industries": "Multiple industries",
         "use_this_template": "Use this template",
         "uses_branching_logic": "This survey uses branching logic."

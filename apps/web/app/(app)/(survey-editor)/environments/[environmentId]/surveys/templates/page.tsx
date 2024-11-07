@@ -68,7 +68,7 @@ const Page = async ({ params, searchParams }: SurveyTemplateProps) => {
       product={product}
       prefilledFilters={prefilledFilters}
       // AI Survey Creation -- Need improvement
-      isAIEnabled={false}
+      isAIEnabled={true}
     />
   );
 };

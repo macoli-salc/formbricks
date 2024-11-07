@@ -42,7 +42,7 @@ import { responseCache } from "../response/cache";
 import { getResponsesByPersonId } from "../response/service";
 import { segmentCache } from "../segment/cache";
 import { createSegment, deleteSegment, evaluateSegment, getSegment, updateSegment } from "../segment/service";
-import { getIsAIEnabled } from "../utils/ai";
+// import { getIsAIEnabled } from "../utils/ai";
 import { diffInDays } from "../utils/datetime";
 import { validateInputs } from "../utils/validate";
 import { surveyCache } from "./cache";
@@ -555,7 +555,8 @@ export const updateSurvey = async (updatedSurvey: TSurvey): Promise<TSurvey> => 
     }
 
     //AI Insights
-    const isAIEnabled = await getIsAIEnabled(organization.billing.plan);
+    // const isAIEnabled = await getIsAIEnabled();
+    const isAIEnabled = false;
     if (isAIEnabled) {
       if (doesSurveyHasOpenTextQuestion(data.questions ?? [])) {
         const openTextQuestions = data.questions?.filter((question) => question.type === "openText") ?? [];
@@ -777,7 +778,8 @@ export const createSurvey = async (
     }
 
     //AI Insights
-    const isAIEnabled = await getIsAIEnabled(organization.billing.plan);
+    // const isAIEnabled = await getIsAIEnabled();
+    const isAIEnabled = false;
     if (isAIEnabled) {
       if (doesSurveyHasOpenTextQuestion(data.questions ?? [])) {
         const openTextQuestions = data.questions?.filter((question) => question.type === "openText") ?? [];

@@ -35,7 +35,7 @@ export const createAISurveyAction = authenticatedActionClient
       throw new Error("Organization not found");
     }
 
-    const isAIEnabled = await getIsAIEnabled(organization.billing.plan);
+    const isAIEnabled = await getIsAIEnabled();
 
     if (!isAIEnabled) {
       throw new Error("AI is not enabled for this organization");
@@ -57,7 +57,7 @@ export const createAISurveyAction = authenticatedActionClient
           })
         ),
       }),
-      system: `You are a survey AI. Create a survey with 3 questions max that fits the schema and user input.`,
+      system: `You are a survey AI. Create a survey with 3 questions max that fits the schema and user input and if is not multiple choice dont create the choices object.`,
       prompt: parsedInput.prompt,
       experimental_telemetry: { isEnabled: true },
     });
@@ -68,9 +68,10 @@ export const createAISurveyAction = authenticatedActionClient
         headline: { default: question.headline },
         subheader: { default: question.subheader },
         type: question.type,
-        choices: question.choices
-          ? question.choices.map((choice) => ({ id: createId(), label: { default: choice } }))
-          : undefined,
+        choices:
+          question.choices && question.choices.length > 0
+            ? question.choices.map((choice) => ({ id: createId(), label: { default: choice } }))
+            : undefined,
         required: true,
       });
     });
