@@ -6,13 +6,12 @@ interface LogoProps {
 
 export const Logo: React.FC<LogoProps> = ({ className = "" }) => {
   return (
-    <div className={`inline-flex items-start gap-[0.625rem] ${className}`}>
+    <div className={`inline-flex items-center gap-[0.625rem] ${className}`}>
       <LogoIcon height={32} width={32} />
-      <span className="text-text-primary dark:text-text-primary-dark text-xl font-bold">EscutaAI</span>
+      <span className="text-text-primary dark:text-text-primary-dark text-xl font-bold">Escuta AI</span>
     </div>
   );
 };
-
 interface IconProps {
   width?: number | string;
   height?: number | string;

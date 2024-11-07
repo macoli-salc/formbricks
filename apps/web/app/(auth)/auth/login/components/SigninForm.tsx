@@ -226,9 +226,6 @@ export const SigninForm = ({
                 className="relative w-full justify-center"
                 loading={loggingIn}>
                 {totpLogin ? t("common.submit") : t("auth.login.login_with_email")}
-                {lastLoggedInWith && lastLoggedInWith === "Email" ? (
-                  <span className="absolute right-3 text-xs opacity-50">{t("auth.last_used")}</span>
-                ) : null}
               </Button>
             )}
           </form>

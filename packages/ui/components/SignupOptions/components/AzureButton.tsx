@@ -44,7 +44,6 @@ export const AzureButton = ({
       variant="secondary"
       className="relative w-full justify-center">
       {text}
-      {lastUsed && <span className="absolute right-3 text-xs opacity-50">{t("auth.last_used")}</span>}
     </Button>
   );
 };

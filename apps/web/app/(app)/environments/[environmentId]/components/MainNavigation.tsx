@@ -282,7 +282,7 @@ export const MainNavigation = ({
                     "flex items-center justify-center transition-opacity duration-100",
                     isTextVisible ? "opacity-0" : "opacity-100"
                   )}>
-                  <Image src={EscutaAILogo} width={160} height={30} alt={t("environments.formbricks_logo")} />
+                  <Image src={EscutaAILogo} width={120} height={30} alt={t("environments.formbricks_logo")} />
                 </Link>
               )}
               <Button
