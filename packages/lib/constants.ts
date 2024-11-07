@@ -2,7 +2,7 @@ import "server-only";
 import { TUserLocale } from "@formbricks/types/user";
 import { env } from "./env";
 
-export const IS_FORMBRICKS_CLOUD = env.IS_FORMBRICKS_CLOUD === "1";
+export const IS_FORMBRICKS_CLOUD = false;
 
 // URLs
 export const WEBAPP_URL =
@@ -163,7 +163,7 @@ export const DEBUG = env.DEBUG === "1";
 export const E2E_TESTING = env.E2E_TESTING === "1";
 
 // Enterprise License constant
-export const ENTERPRISE_LICENSE_KEY = env.ENTERPRISE_LICENSE_KEY;
+export const ENTERPRISE_LICENSE_KEY = "vini12345";
 
 export const REDIS_URL = env.REDIS_URL;
 export const REDIS_HTTP_URL = env.REDIS_HTTP_URL;

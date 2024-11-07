@@ -485,7 +485,7 @@ export const mockSurvey: TSurvey = {
       subheader: {
         default: "We appreciate your feedback.",
       },
-      buttonLink: "https://formbricks.com",
+      buttonLink: "https://escuta.ai",
       buttonLabel: { default: "Create your own Survey" },
     },
   ],

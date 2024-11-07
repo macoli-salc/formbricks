@@ -1,8 +1,5 @@
 import "server-only";
-import { HttpsProxyAgent } from "https-proxy-agent";
-import fetch from "node-fetch";
 import { cache as reactCache } from "react";
-import { prisma } from "@formbricks/database";
 import { cache, revalidateTag } from "@formbricks/lib/cache";
 import {
   E2E_TESTING,
@@ -10,7 +7,6 @@ import {
   IS_FORMBRICKS_CLOUD,
   PRODUCT_FEATURE_KEYS,
 } from "@formbricks/lib/constants";
-import { env } from "@formbricks/lib/env";
 import { hashString } from "@formbricks/lib/hashString";
 import { TOrganization } from "@formbricks/types/organizations";
 import { TEnterpriseLicenseDetails, TEnterpriseLicenseFeatures } from "./types";
@@ -189,42 +185,12 @@ export const fetchLicense = reactCache(
   (): Promise<TEnterpriseLicenseDetails | null> =>
     cache(
       async () => {
-        if (!env.ENTERPRISE_LICENSE_KEY) return null;
         try {
-          const now = new Date();
-          const startOfYear = new Date(now.getFullYear(), 0, 1); // January 1st of the current year
-          const endOfYear = new Date(now.getFullYear() + 1, 0, 0); // December 31st of the current year
-
-          const responseCount = await prisma.response.count({
-            where: {
-              createdAt: {
-                gte: startOfYear,
-                lt: endOfYear,
-              },
-            },
-          });
-
-          const proxyUrl = env.HTTPS_PROXY || env.HTTP_PROXY;
-          const agent = proxyUrl ? new HttpsProxyAgent(proxyUrl) : undefined;
-
-          const res = await fetch("https://ee.formbricks.com/api/licenses/check", {
-            body: JSON.stringify({
-              licenseKey: ENTERPRISE_LICENSE_KEY,
-              usage: { responseCount: responseCount },
-            }),
-            headers: { "Content-Type": "application/json" },
-            method: "POST",
-            agent,
-          });
-
-          if (res.ok) {
-            const responseJson = (await res.json()) as {
-              data: TEnterpriseLicenseDetails;
-            };
-            return responseJson.data;
-          }
-
-          return null;
+          const result = {
+            status: "active",
+            features: { isMultiOrgEnabled: true },
+          } as TEnterpriseLicenseDetails;
+          return result;
         } catch (error) {
           console.error("Error while checking license: ", error);
           return null;

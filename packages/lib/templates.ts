@@ -33,7 +33,7 @@ export const getDefaultEndingCard = (languages: TSurveyLanguage[], locale: strin
     headline: createI18nString(translate("default_ending_card_headline", locale), languageCodes),
     subheader: createI18nString(translate("default_ending_card_subheader", locale), languageCodes),
     buttonLabel: createI18nString(translate("default_ending_card_button_label", locale), languageCodes),
-    buttonLink: "https://formbricks.com",
+    buttonLink: "https://escuta.ai",
   };
 };
 
@@ -997,7 +997,7 @@ const churnSurvey = (locale: string): TTemplate => {
           ],
           headline: { default: translate("churn_survey_question_3_headline", locale) },
           required: true,
-          buttonUrl: "https://formbricks.com",
+          buttonUrl: "https://escuta.ai",
           buttonLabel: { default: translate("churn_survey_question_3_button_label", locale) },
           buttonExternal: true,
           backButtonLabel: { default: translate("back", locale) },
@@ -1554,7 +1554,7 @@ const improveTrialConversion = (locale: string): TTemplate => {
           ],
           headline: { default: translate("improve_trial_conversion_question_4_headline", locale) },
           required: true,
-          buttonUrl: "https://formbricks.com/github",
+          buttonUrl: "https://escuta.ai/github",
           buttonLabel: { default: translate("improve_trial_conversion_question_4_button_label", locale) },
           buttonExternal: true,
           dismissButtonLabel: {
@@ -1752,7 +1752,7 @@ const reviewPrompt = (locale: string): TTemplate => {
           ],
           headline: { default: translate("review_prompt_question_2_headline", locale) },
           required: true,
-          buttonUrl: "https://formbricks.com/github",
+          buttonUrl: "https://escuta.ai/github",
           buttonLabel: { default: translate("review_prompt_question_2_button_label", locale) },
           buttonExternal: true,
           backButtonLabel: { default: translate("back", locale) },
@@ -5428,7 +5428,7 @@ const improveNewsletterContent = (locale: string): TTemplate => {
           type: TSurveyQuestionTypeEnum.CTA,
           headline: { default: translate("improve_newsletter_content_question_3_headline", locale) },
           required: false,
-          buttonUrl: "https://formbricks.com",
+          buttonUrl: "https://escuta.ai",
           buttonLabel: { default: translate("improve_newsletter_content_question_3_button_label", locale) },
           buttonExternal: true,
           dismissButtonLabel: {
