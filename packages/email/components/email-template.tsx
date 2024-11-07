@@ -14,7 +14,7 @@ export function EmailTemplate({ children }): React.JSX.Element {
               <Img
                 alt="EscutaAI Logo"
                 className="mx-auto w-80"
-                src="https://s3.eu-central-1.amazonaws.com/listmonk-formbricks/Formbricks-Light-transparent.png"
+                src="https://cpnmrpresebjquyyckgb.supabase.co/storage/v1/object/public/escuta-ai-images/escuta-ai-transparent-email.png"
               />
             </Link>
           </Section>
