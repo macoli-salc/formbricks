@@ -1,7 +1,6 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useTranslations } from "next-intl";
 import { FORMBRICKS_LOGGED_IN_WITH_LS } from "@formbricks/lib/localStorage";
 import { Button } from "../../Button";
 import { GoogleIcon } from "../../icons";
@@ -9,13 +8,11 @@ import { GoogleIcon } from "../../icons";
 export const GoogleButton = ({
   text = "Continue with Google",
   inviteUrl,
-  lastUsed,
 }: {
   text?: string;
   inviteUrl?: string | null;
   lastUsed?: boolean;
 }) => {
-  const t = useTranslations();
   const handleLogin = async () => {
     if (typeof window !== "undefined") {
       localStorage.setItem(FORMBRICKS_LOGGED_IN_WITH_LS, "Google");
