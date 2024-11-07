@@ -22,7 +22,7 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Primary: Story = {
+export const IntegrationCardPrimary: Story = {
   args: {
     label: "Card Label",
     description: "This is the description of the card.",
@@ -37,7 +37,7 @@ export const Primary: Story = {
   },
 };
 
-export const Disconnected: Story = {
+export const IntegrationCardDisconnected: Story = {
   args: {
     label: "Card Label",
     description: "This is the description of the card.",
@@ -52,7 +52,7 @@ export const Disconnected: Story = {
   },
 };
 
-export const WithIcon: Story = {
+export const IntegrationCardWithIcon: Story = {
   args: {
     label: "Card Label",
     description: "This is the description of the card.",
