@@ -326,7 +326,7 @@ export const Navigation = ({ isMobile, ...props }: NavigationProps) => {
         ))}
         <li className="sticky bottom-0 z-10 mt-6 min-[416px]:hidden">
           <Button
-            href="https://app.formbricks.com/auth/signup"
+            href="https://app.escuta.ai/auth/signup"
             target="_blank"
             variant="filled"
             className="w-full">

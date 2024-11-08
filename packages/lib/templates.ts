@@ -3665,7 +3665,7 @@ const marketSiteClarity = (locale: string): TTemplate => {
           headline: { default: translate("market_site_clarity_question_3_headline", locale) },
           required: false,
           buttonLabel: { default: translate("market_site_clarity_question_3_button_label", locale) },
-          buttonUrl: "https://app.formbricks.com/auth/signup",
+          buttonUrl: "https://app.escuta.ai/auth/signup",
           buttonExternal: true,
           backButtonLabel: { default: translate("back", locale) },
         },
@@ -5037,7 +5037,7 @@ const identifySignUpBarriers = (locale: string): TTemplate => {
           type: TSurveyQuestionTypeEnum.CTA,
           headline: { default: translate("identify_sign_up_barriers_question_9_headline", locale) },
           required: false,
-          buttonUrl: "https://app.formbricks.com/auth/signup",
+          buttonUrl: "https://app.escuta.ai/auth/signup",
           buttonLabel: { default: translate("identify_sign_up_barriers_question_9_button_label", locale) },
           buttonExternal: true,
           dismissButtonLabel: {

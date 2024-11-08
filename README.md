@@ -46,7 +46,7 @@ Harvest user-insights, build irresistible experiences.
 
 Formbricks provides a free and open source surveying platform. Gather feedback at every point in the user journey with beautiful in-app, website, link and email surveys. Build on top of Formbricks or leverage prebuilt data analysis capabilities.
 
-**Try it out in the cloud at [formbricks.com](https://app.formbricks.com/auth/signup)**
+**Try it out in the cloud at [formbricks.com](https://app.escuta.ai/auth/signup)**
 
 ## 💪 Mission: Empower your team, craft an irresistible experience.
 
@@ -118,7 +118,7 @@ We've got several options depending on your need to help you quickly get started
 
 ### ☁️ Cloud Version
 
-Formbricks has a hosted cloud offering with a generous free plan to get you up and running as quickly as possible. To get started, please visit [formbricks.com](https://app.formbricks.com/auth/signup).
+Formbricks has a hosted cloud offering with a generous free plan to get you up and running as quickly as possible. To get started, please visit [formbricks.com](https://app.escuta.ai/auth/signup).
 
 <a id="self-hosted-version"></a>
 

@@ -3,6 +3,7 @@
     "baseUrl": ".",
     "lib": ["ES2021.String"],
     "paths": {
+      "@/*": ["./*"],
       "@formbricks/ui/*": ["./*"]
     }
   },

@@ -21,7 +21,7 @@ export const CLOUD_PRICING_DATA = {
         "environments.settings.billing.all_integrations",
         "environments.settings.billing.all_surveying_features",
       ],
-      href: "https://app.formbricks.com/auth/signup?plan=free",
+      href: "https://app.escuta.ai/auth/signup?plan=free",
     },
     {
       name: "environments.settings.billing.startup",
@@ -36,7 +36,7 @@ export const CLOUD_PRICING_DATA = {
         "environments.settings.billing.5000_monthly_responses",
         "environments.settings.billing.7500_monthly_identified_users",
       ],
-      href: "https://app.formbricks.com/auth/signup?plan=startup",
+      href: "https://app.escuta.ai/auth/signup?plan=startup",
     },
     {
       name: "environments.settings.billing.scale",
@@ -53,7 +53,7 @@ export const CLOUD_PRICING_DATA = {
         "environments.settings.billing.10000_monthly_responses",
         "environments.settings.billing.30000_monthly_identified_users",
       ],
-      href: "https://app.formbricks.com/auth/signup?plan=scale",
+      href: "https://app.escuta.ai/auth/signup?plan=scale",
     },
     {
       name: "environments.settings.billing.enterprise",

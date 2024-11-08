@@ -80,7 +80,7 @@ export const Header = forwardRef<React.ElementRef<"div">, { className?: string }
           <ThemeToggle />
         </div>
         <div className="hidden min-[416px]:contents">
-          <Button href="https://app.formbricks.com/auth/signup" target="_blank" className="w-max">
+          <Button href="https://app.escuta.ai/auth/signup" target="_blank" className="w-max">
             Get Started
           </Button>
         </div>
