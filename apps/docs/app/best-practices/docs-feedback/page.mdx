@@ -37,7 +37,7 @@ To get this running, you'll need a bit of time. Here are the steps we're going t
 
 ## 1. Setting up Formbricks Cloud
 
-1. To get started, create an account for the [Formbricks Cloud](https://app.formbricks.com/auth/signup).
+1. To get started, create an account for the [Formbricks Cloud](https://app.escuta.ai/auth/signup).
 
 2. In the Menu (top right) you see that you can toggle switch between a “Development” and a “Production” environment. These are two separate environments so your test data doesn’t mess up the insights from prod. Switch to “Development”:
 
@@ -413,7 +413,7 @@ Now, you have to replace the IDs and the API host accordingly in your `handleFee
 
   try {
     const res = await fetch(
-			// Note that we also updated the API host to 'https://app.formbricks.com/'
+			// Note that we also updated the API host to 'https://app.escuta.ai/'
       `https:app.formbricks.com/api/v1/client/environments/clgwcwp4z000lpf0hur7uxbuv/responses`,
   };
 ```
@@ -427,8 +427,8 @@ And lastly, in the `updateFeedback` function
 ```tsx
   try {
     const res = await fetch(
-		// Note that we also updated the API host to 'https://app.formbricks.com/'
-      `https:app.formbricks.com/api/v1/client/environments/clgwcwp4z000lpf0hur7uxbuv/responses/${responseId}`, // Note that we also updated the API host to 'https://app.formbricks.com/'
+		// Note that we also updated the API host to 'https://app.escuta.ai/'
+      `https:app.formbricks.com/api/v1/client/environments/clgwcwp4z000lpf0hur7uxbuv/responses/${responseId}`, // Note that we also updated the API host to 'https://app.escuta.ai/'
 }
 ```
 

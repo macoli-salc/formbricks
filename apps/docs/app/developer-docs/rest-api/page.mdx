@@ -45,7 +45,7 @@ We currently have the following Management API methods exposed and below is thei
 
 The API requests are authorized with a personal API key. This API key gives you the same rights as if you were logged in at formbricks.com - **don't share it around!**
 
-1. Go to your settings on [app.formbricks.com](https://app.formbricks.com).
+1. Go to your settings on [app.formbricks.com](https://app.escuta.ai).
 2. Go to page “API keys”
    <MdxImage src={AddApiKey} alt="Add API Key" quality="100" className="max-w-full rounded-lg sm:max-w-3xl" />
 3. Create a key for the development or production environment.
@@ -83,7 +83,7 @@ Hit the below request to verify that you are authenticated with your API Key and
 
     ### Delete a personal API key
 
-    1. Go to settings on [app.formbricks.com](https://app.formbricks.com/).
+    1. Go to settings on [app.formbricks.com](https://app.escuta.ai/).
     2. Go to page “API keys”.
     3. Find the key you wish to revoke and select “Delete”.
     4. Your API key will stop working immediately.
@@ -95,7 +95,7 @@ Hit the below request to verify that you are authenticated with your API Key and
 
     ```bash {{ title: 'cURL' }}
     curl --location \
-    'https://app.formbricks.com/api/v1/me' \
+    'https://app.escuta.ai/api/v1/me' \
     --header \
     'x-api-key: <your-api-key>'
     ```

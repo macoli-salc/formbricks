@@ -26,7 +26,7 @@ import Formbricks, { track } from "@formbricks/react-native";
 export default function App() {
   const config = {
     environmentId: "your-environment-id",
-    apiHost: "https://app.formbricks.com",
+    apiHost: "https://app.escuta.ai",
     userId: "hello-user",
     attributes: {
       plan: "free",

@@ -2,7 +2,7 @@
 
 This is the official API wrapper for Formbricks. It is used to interact with the Formbricks API. To know more about Formbricks, visit [Formbricks.com](https://formbricks.com).
 
-The direct API documentation can be found in our official docs [here](https://formbricks.com/docs/api/client/overview). To interact with the Formbricks API, you need to have an environment ID. You can get it from the Formbricks dashboard at [app.formbricks.com](https://app.formbricks.com).
+The direct API documentation can be found in our official docs [here](https://formbricks.com/docs/api/client/overview). To interact with the Formbricks API, you need to have an environment ID. You can get it from the Formbricks dashboard at [app.formbricks.com](https://app.escuta.ai).
 
 ## Installation
 
@@ -18,7 +18,7 @@ npm install @formbricks/api
 import { FormbricksAPI } from "@formbricks/api";
 
 const api = new FormbricksAPI({
-  apiHost: `https://app.formbricks.com`, // If you have self-hosted Formbricks, change this to your self hosted instance's URL
+  apiHost: `https://app.escuta.ai`, // If you have self-hosted Formbricks, change this to your self hosted instance's URL
   environmentId: "<environment-id>", // Replace this with your Formbricks environment ID
 });
 ```

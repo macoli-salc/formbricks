@@ -44,7 +44,7 @@ Embedding Formbricks surveys directly into your web pages & emails allows you to
 ```html
 <div style="position: relative; height:100vh; max-height:100vh; overflow:auto;">
   <iframe
-    src="https://app.formbricks.com/s/<your-surveyId>"
+    src="https://app.escuta.ai/s/<your-surveyId>"
     frameborder="0"
     style="position: absolute; left:0; top:0; width:100%; height:100%; border:0;">
   </iframe>
@@ -80,8 +80,8 @@ The iframe fires a **formbricksSurveyCompleted** event when a user finishes a su
 
 ```javascript
 window.addEventListener("message", (event) => {
-  // Replace 'https://app.formbricks.com' with the actual web app url
-  if (event.origin === "https://app.formbricks.com" && event.data === "formbricksSurveyCompleted") {
+  // Replace 'https://app.escuta.ai' with the actual web app url
+  if (event.origin === "https://app.escuta.ai" && event.data === "formbricksSurveyCompleted") {
     console.log("Survey completed!");
     // Implement your custom actions here
   }
