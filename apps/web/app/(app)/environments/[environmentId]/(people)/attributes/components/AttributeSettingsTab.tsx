@@ -78,10 +78,7 @@ export const AttributeSettingsTab = async ({ attributeClass, setOpen }: Attribut
         </div>
         <div className="flex justify-between border-t border-slate-200 pt-6">
           <div className="flex items-center">
-            <Button
-              variant="secondary"
-              href="https://formbricks.com/docs/attributes/identify-users"
-              target="_blank">
+            <Button variant="secondary" href="https://escuta.ai" target="_blank">
               {t("common.read_docs")}
             </Button>
             {attributeClass.type !== "automatic" && (

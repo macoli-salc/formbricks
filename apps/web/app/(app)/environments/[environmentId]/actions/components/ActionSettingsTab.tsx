@@ -225,7 +225,7 @@ export const ActionSettingsTab = ({
                 </Button>
               )}
 
-              <Button variant="secondary" href="https://formbricks.com/docs/actions/no-code" target="_blank">
+              <Button variant="secondary" href="https://escuta.ai" target="_blank">
                 {t("common.read_docs")}
               </Button>
             </div>

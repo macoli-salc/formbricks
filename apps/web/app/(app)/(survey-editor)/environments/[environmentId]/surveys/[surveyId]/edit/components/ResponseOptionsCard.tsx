@@ -424,10 +424,7 @@ export const ResponseOptionsCard = ({
                         )}
                       </li>
                       <li className="text-sm text-slate-600">
-                        <Link
-                          href="https://formbricks.com/docs/link-surveys/single-use-links"
-                          target="_blank"
-                          className="underline">
+                        <Link href="https://escuta.ai" target="_blank" className="underline">
                           {t("common.read_docs")} <ArrowUpRight className="inline" size={16} />
                         </Link>
                       </li>

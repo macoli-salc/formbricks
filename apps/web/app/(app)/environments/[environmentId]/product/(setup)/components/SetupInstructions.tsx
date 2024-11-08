@@ -78,10 +78,7 @@ if (typeof window !== "undefined") {
               {t("environments.product.app-connection.to_the_url_where_you_load_the")}{" "}
               {t("environments.product.app-connection.formbricks_sdk")}.{" "}
               {t("environments.product.app-connection.open_the_browser_console_to_see_the_logs")}{" "}
-              <Link
-                className="decoration-brand-dark"
-                href="https://formbricks.com/docs/developer-docs/js-sdk#debug-mode"
-                target="_blank">
+              <Link className="decoration-brand-dark" href="https://escuta.ai" target="_blank">
                 {t("common.read_docs")}
               </Link>{" "}
             </p>
@@ -90,23 +87,17 @@ if (typeof window !== "undefined") {
             <ul className="list-disc text-sm text-slate-700">
               <li>
                 <span>{t("environments.product.app-connection.need_a_more_detailed_setup_guide_for")}</span>{" "}
-                <Link
-                  className="decoration-brand-dark"
-                  href="https://formbricks.com/docs/website-surveys/quickstart"
-                  target="_blank">
+                <Link className="decoration-brand-dark" href="https://escuta.ai" target="_blank">
                   {t("environments.product.app-connection.check_out_the_docs")}
                 </Link>
               </li>
               <li>
                 <span>{t("environments.product.app-connection.not_working")}</span>{" "}
-                <Link className="decoration-brand-dark" href="https://formbricks.com/discord" target="_blank">
+                <Link className="decoration-brand-dark" href="https://escuta.ai" target="_blank">
                   {t("environments.product.app-connection.join_discord")}
                 </Link>{" "}
                 {t("environments.product.app-connection.or")}{" "}
-                <Link
-                  className="decoration-brand-dark"
-                  target="_blank"
-                  href="https://github.com/formbricks/formbricks/issues">
+                <Link className="decoration-brand-dark" target="_blank" href="https://escuta.ai">
                   {t("environments.product.app-connection.open_an_issue_on_github")}
                 </Link>{" "}
               </li>
@@ -114,10 +105,7 @@ if (typeof window !== "undefined") {
                 <span>
                   {t("environments.product.app-connection.want_to_learn_how_to_add_user_attributes")}
                 </span>{" "}
-                <Link
-                  className="decoration-brand-dark"
-                  href="https://formbricks.com/docs/attributes/why"
-                  target="_blank">
+                <Link className="decoration-brand-dark" href="https://escuta.ai" target="_blank">
                   {t("environments.product.app-connection.dive_into_the_docs")}
                 </Link>
               </li>
@@ -142,10 +130,7 @@ if (typeof window !== "undefined") {
               {t("environments.product.app-connection.to_the_url_where_you_load_the")}{" "}
               {t("environments.product.app-connection.formbricks_sdk")}.{" "}
               {t("environments.product.app-connection.open_the_browser_console_to_see_the_logs")}{" "}
-              <Link
-                className="decoration-brand-dark"
-                href="https://formbricks.com/docs/developer-docs/js-sdk#debug-mode"
-                target="_blank">
+              <Link className="decoration-brand-dark" href="https://escuta.ai" target="_blank">
                 {t("common.read_docs")}
               </Link>{" "}
             </p>
@@ -162,14 +147,11 @@ if (typeof window !== "undefined") {
                 <span className="font-semibold">
                   {t("environments.product.app-connection.have_a_problem")}
                 </span>{" "}
-                <Link
-                  className="decoration-brand-dark"
-                  target="_blank"
-                  href="https://github.com/formbricks/formbricks/issues">
+                <Link className="decoration-brand-dark" target="_blank" href="https://escuta.ai">
                   {t("environments.product.app-connection.open_an_issue_on_github")}
                 </Link>{" "}
                 {t("environments.product.app-connection.or")}{" "}
-                <Link className="decoration-brand-dark" href="https://formbricks.com/discord" target="_blank">
+                <Link className="decoration-brand-dark" href="https://escuta.ai" target="_blank">
                   {t("environments.product.app-connection.join_discord")}
                 </Link>
               </li>
@@ -177,10 +159,7 @@ if (typeof window !== "undefined") {
                 <span className="font-semibold">
                   {t("environments.product.app-connection.want_to_learn_how_to_add_user_attributes")}
                 </span>{" "}
-                <Link
-                  className="decoration-brand-dark"
-                  href="https://formbricks.com/docs/attributes/why"
-                  target="_blank">
+                <Link className="decoration-brand-dark" href="https://escuta.ai" target="_blank">
                   {t("environments.product.app-connection.dive_into_the_docs")}
                 </Link>
               </li>

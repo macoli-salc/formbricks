@@ -119,7 +119,7 @@ export const OnboardingSetupInstructions = ({
               id="onboarding-inapp-connect-read-npm-docs"
               className="mt-3"
               variant="secondary"
-              href={`https://formbricks.com/docs/${channel}-surveys/framework-guides`}
+              href={`https://escuta.ai`}
               target="_blank">
               {t("common.read_docs")}
             </Button>

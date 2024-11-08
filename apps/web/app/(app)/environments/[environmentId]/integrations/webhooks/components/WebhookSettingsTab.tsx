@@ -214,10 +214,7 @@ export const WebhookSettingsTab = ({ webhook, surveys, setOpen }: ActionSettings
               </Button>
             )}
 
-            <Button
-              variant="secondary"
-              href="https://formbricks.com/docs/api/management/webhooks"
-              target="_blank">
+            <Button variant="secondary" href="https://escuta.ai" target="_blank">
               {t("common.read_docs")}
             </Button>
           </div>
