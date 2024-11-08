@@ -1,6 +1,5 @@
 "use server";
 
-import { insightCache } from "@/lib/cache/insight";
 import {
   getDocumentsByInsightId,
   getDocumentsByInsightIdSurveyIdQuestionId,
@@ -9,7 +8,6 @@ import { z } from "zod";
 import { prisma } from "@formbricks/database";
 import { authenticatedActionClient } from "@formbricks/lib/actionClient";
 import { checkAuthorization } from "@formbricks/lib/actionClient/utils";
-import { cache } from "@formbricks/lib/cache";
 import { getOrganizationIdFromEnvironmentId } from "@formbricks/lib/organization/utils";
 import { ZId } from "@formbricks/types/common";
 import { ZDocumentFilterCriteria } from "@formbricks/types/documents";
@@ -24,35 +22,27 @@ const ZGetDocumentsByInsightIdSurveyIdQuestionIdAction = z.object({
   offset: z.number().optional(),
 });
 
-const getOrganizationIdFromInsightId = async (insightId: string) =>
-  cache(
-    async () => {
-      const insight = await prisma.insight.findUnique({
-        where: {
-          id: insightId,
-        },
-        select: {
-          environmentId: true,
-        },
-      });
-
-      if (!insight) {
-        throw new Error("Insight not found");
-      }
-
-      return await getOrganizationIdFromEnvironmentId(insight.environmentId);
+const getOrganizationIdFromInsightId = async (insightId: string) => {
+  const insight = await prisma.insight.findUnique({
+    where: {
+      id: insightId,
     },
-    [`getInsight-${insightId}`],
-    {
-      tags: [insightCache.tag.byId(insightId)],
-    }
-  )();
+    select: {
+      environmentId: true,
+    },
+  });
+
+  if (!insight) {
+    throw new Error("Insight not found");
+  }
+
+  return await getOrganizationIdFromEnvironmentId(insight.environmentId);
+};
 
 export const getDocumentsByInsightIdSurveyIdQuestionIdAction = authenticatedActionClient
   .schema(ZGetDocumentsByInsightIdSurveyIdQuestionIdAction)
   .action(async ({ ctx, parsedInput }) => {
     const insight = await getOrganizationIdFromInsightId(parsedInput.insightId);
-
     if (!insight) {
       throw new Error("Insight not found");
     }
@@ -109,7 +99,6 @@ export const updateDocumentAction = authenticatedActionClient
   .schema(ZUpdateDocumentAction)
   .action(async ({ ctx, parsedInput }) => {
     const document = await getDocument(parsedInput.documentId);
-
     if (!document) {
       throw new Error("Document not found");
     }

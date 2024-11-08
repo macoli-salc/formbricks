@@ -5,94 +5,72 @@ import { ZOptionalNumber } from "@formbricks/types/common";
 import { ZId } from "@formbricks/types/common";
 import { DatabaseError, InvalidInputError, ResourceNotFoundError } from "@formbricks/types/errors";
 import { TWebhook, TWebhookInput, ZWebhookInput } from "@formbricks/types/webhooks";
-import { cache } from "../cache";
 import { ITEMS_PER_PAGE } from "../constants";
 import { validateInputs } from "../utils/validate";
 import { webhookCache } from "./cache";
 
-export const getWebhooks = (environmentId: string, page?: number): Promise<TWebhook[]> =>
-  cache(
-    async () => {
-      validateInputs([environmentId, ZId], [page, ZOptionalNumber]);
+export const getWebhooks = async (environmentId: string, page?: number): Promise<TWebhook[]> => {
+  validateInputs([environmentId, ZId], [page, ZOptionalNumber]);
 
-      try {
-        const webhooks = await prisma.webhook.findMany({
-          where: {
-            environmentId: environmentId,
-          },
-          take: page ? ITEMS_PER_PAGE : undefined,
-          skip: page ? ITEMS_PER_PAGE * (page - 1) : undefined,
-        });
-        return webhooks;
-      } catch (error) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          throw new DatabaseError(error.message);
-        }
-
-        throw error;
-      }
-    },
-    [`getWebhooks-${environmentId}-${page}`],
-    {
-      tags: [webhookCache.tag.byEnvironmentId(environmentId)],
+  try {
+    const webhooks = await prisma.webhook.findMany({
+      where: {
+        environmentId: environmentId,
+      },
+      take: page ? ITEMS_PER_PAGE : undefined,
+      skip: page ? ITEMS_PER_PAGE * (page - 1) : undefined,
+    });
+    return webhooks;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
     }
-  )();
 
-export const getWebhookCountBySource = (
+    throw error;
+  }
+};
+
+export const getWebhookCountBySource = async (
   environmentId: string,
   source: TWebhookInput["source"]
-): Promise<number> =>
-  cache(
-    async () => {
-      validateInputs([environmentId, ZId], [source, ZId]);
+): Promise<number> => {
+  validateInputs([environmentId, ZId], [source, ZId]);
 
-      try {
-        const count = await prisma.webhook.count({
-          where: {
-            environmentId,
-            source,
-          },
-        });
-        return count;
-      } catch (error) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          throw new DatabaseError(error.message);
-        }
-
-        throw error;
-      }
-    },
-    [`getWebhookCountBySource-${environmentId}-${source}`],
-    {
-      tags: [webhookCache.tag.byEnvironmentIdAndSource(environmentId, source)],
+  try {
+    const count = await prisma.webhook.count({
+      where: {
+        environmentId,
+        source,
+      },
+    });
+    return count;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
     }
-  )();
 
-export const getWebhook = async (id: string): Promise<TWebhook | null> =>
-  cache(
-    async () => {
-      validateInputs([id, ZId]);
+    throw error;
+  }
+};
 
-      try {
-        const webhook = await prisma.webhook.findUnique({
-          where: {
-            id,
-          },
-        });
-        return webhook;
-      } catch (error) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          throw new DatabaseError(error.message);
-        }
+export const getWebhook = async (id: string): Promise<TWebhook | null> => {
+  validateInputs([id, ZId]);
 
-        throw error;
-      }
-    },
-    [`getWebhook-${id}`],
-    {
-      tags: [webhookCache.tag.byId(id)],
+  try {
+    const webhook = await prisma.webhook.findUnique({
+      where: {
+        id,
+      },
+    });
+    return webhook;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
     }
-  )();
+
+    throw error;
+  }
+};
 
 export const createWebhook = async (
   environmentId: string,

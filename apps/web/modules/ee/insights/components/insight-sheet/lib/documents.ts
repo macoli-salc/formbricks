@@ -1,10 +1,6 @@
-import { documentCache } from "@/lib/cache/document";
-import { insightCache } from "@/lib/cache/insight";
 import { Prisma } from "@prisma/client";
-import { cache as reactCache } from "react";
 import { z } from "zod";
 import { prisma } from "@formbricks/database";
-import { cache } from "@formbricks/lib/cache";
 import { DOCUMENTS_PER_PAGE } from "@formbricks/lib/constants";
 import { validateInputs } from "@formbricks/lib/utils/validate";
 import { ZId } from "@formbricks/types/common";
@@ -17,147 +13,114 @@ import {
 import { DatabaseError } from "@formbricks/types/errors";
 import { TSurveyQuestionId, ZSurveyQuestionId } from "@formbricks/types/surveys/types";
 
-export const getDocumentsByInsightId = reactCache(
-  (
-    insightId: string,
-    limit?: number,
-    offset?: number,
-    filterCriteria?: TDocumentFilterCriteria
-  ): Promise<TDocument[]> =>
-    cache(
-      async () => {
-        validateInputs(
-          [insightId, ZId],
-          [limit, z.number().optional()],
-          [offset, z.number().optional()],
-          [filterCriteria, ZDocumentFilterCriteria.optional()]
-        );
+export const getDocumentsByInsightId = async (
+  insightId: string,
+  limit?: number,
+  offset?: number,
+  filterCriteria?: TDocumentFilterCriteria
+): Promise<TDocument[]> => {
+  validateInputs(
+    [insightId, ZId],
+    [limit, z.number().optional()],
+    [offset, z.number().optional()],
+    [filterCriteria, ZDocumentFilterCriteria.optional()]
+  );
 
-        limit = limit ?? DOCUMENTS_PER_PAGE;
-        try {
-          const documents = await prisma.document.findMany({
-            where: {
-              documentInsights: {
-                some: {
-                  insightId,
-                },
-              },
-              createdAt: {
-                gte: filterCriteria?.createdAt?.min,
-                lte: filterCriteria?.createdAt?.max,
-              },
-            },
-            orderBy: [
-              {
-                createdAt: "desc",
-              },
-            ],
-            take: limit ? limit : undefined,
-            skip: offset ? offset : undefined,
-          });
-
-          return documents;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-
-          throw error;
-        }
+  limit = limit ?? DOCUMENTS_PER_PAGE;
+  try {
+    const documents = await prisma.document.findMany({
+      where: {
+        documentInsights: {
+          some: {
+            insightId,
+          },
+        },
+        createdAt: {
+          gte: filterCriteria?.createdAt?.min,
+          lte: filterCriteria?.createdAt?.max,
+        },
       },
-      [`getDocumentsByInsightId-${insightId}-${limit}-${offset}`],
-      {
-        tags: [documentCache.tag.byInsightId(insightId), insightCache.tag.byId(insightId)],
-      }
-    )()
-);
+      orderBy: [
+        {
+          createdAt: "desc",
+        },
+      ],
+      take: limit ? limit : undefined,
+      skip: offset ? offset : undefined,
+    });
 
-export const getDocumentsByInsightIdSurveyIdQuestionId = reactCache(
-  (
-    insightId: string,
-    surveyId: string,
-    questionId: TSurveyQuestionId,
-    limit?: number,
-    offset?: number
-  ): Promise<TDocument[]> =>
-    cache(
-      async () => {
-        validateInputs(
-          [insightId, ZId],
-          [surveyId, ZId],
-          [questionId, ZSurveyQuestionId],
-          [limit, z.number().optional()],
-          [offset, z.number().optional()]
-        );
+    return documents;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+    throw error;
+  }
+};
 
-        limit = limit ?? DOCUMENTS_PER_PAGE;
-        try {
-          const documents = await prisma.document.findMany({
-            where: {
-              questionId,
-              surveyId,
-              documentInsights: {
-                some: {
-                  insightId,
-                },
-              },
-            },
-            orderBy: [
-              {
-                createdAt: "desc",
-              },
-            ],
-            take: limit ? limit : undefined,
-            skip: offset ? offset : undefined,
-          });
+export const getDocumentsByInsightIdSurveyIdQuestionId = async (
+  insightId: string,
+  surveyId: string,
+  questionId: TSurveyQuestionId,
+  limit?: number,
+  offset?: number
+): Promise<TDocument[]> => {
+  validateInputs(
+    [insightId, ZId],
+    [surveyId, ZId],
+    [questionId, ZSurveyQuestionId],
+    [limit, z.number().optional()],
+    [offset, z.number().optional()]
+  );
 
-          return documents;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-
-          throw error;
-        }
+  limit = limit ?? DOCUMENTS_PER_PAGE;
+  try {
+    const documents = await prisma.document.findMany({
+      where: {
+        questionId,
+        surveyId,
+        documentInsights: {
+          some: {
+            insightId,
+          },
+        },
       },
-      [`getDocumentsByInsightIdSurveyIdQuestionId-${insightId}-${surveyId}-${questionId}-${limit}-${offset}`],
-      {
-        tags: [
-          documentCache.tag.byInsightIdSurveyIdQuestionId(insightId, surveyId, questionId),
-          insightCache.tag.byId(insightId),
-        ],
-      }
-    )()
-);
+      orderBy: [
+        {
+          createdAt: "desc",
+        },
+      ],
+      take: limit ? limit : undefined,
+      skip: offset ? offset : undefined,
+    });
 
-export const getDocument = reactCache(
-  (documentId: string): Promise<TDocument | null> =>
-    cache(
-      async () => {
-        validateInputs([documentId, ZId]);
+    return documents;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+    throw error;
+  }
+};
 
-        try {
-          const document = await prisma.document.findUnique({
-            where: {
-              id: documentId,
-            },
-          });
+export const getDocument = async (documentId: string): Promise<TDocument | null> => {
+  validateInputs([documentId, ZId]);
 
-          return document;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-
-          throw error;
-        }
+  try {
+    const document = await prisma.document.findUnique({
+      where: {
+        id: documentId,
       },
-      [`getDocumentById-${documentId}`],
-      {
-        tags: [documentCache.tag.byId(documentId)],
-      }
-    )()
-);
+    });
+
+    return document;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+    throw error;
+  }
+};
 
 export const updateDocument = async (documentId: string, data: Partial<TDocument>): Promise<TDocument> => {
   validateInputs([documentId, ZId], [data, ZDocument.partial()]);
@@ -167,14 +130,11 @@ export const updateDocument = async (documentId: string, data: Partial<TDocument
       data,
     });
 
-    documentCache.revalidate({ environmentId: updatedDocument.environmentId });
-
     return updatedDocument;
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       throw new DatabaseError(error.message);
     }
-
     throw error;
   }
 };

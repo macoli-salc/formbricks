@@ -1,7 +1,6 @@
 import "server-only";
 import { Prisma } from "@prisma/client";
 import { getServerSession } from "next-auth";
-import { cache as reactCache } from "react";
 import { prisma } from "@formbricks/database";
 import { ZOptionalNumber, ZString } from "@formbricks/types/common";
 import {
@@ -18,7 +17,6 @@ import {
   ZInvitee,
 } from "@formbricks/types/invites";
 import { authOptions } from "../authOptions";
-import { cache } from "../cache";
 import { ITEMS_PER_PAGE } from "../constants";
 import { getMembershipByUserIdOrganizationId } from "../membership/service";
 import { validateInputs } from "../utils/validate";
@@ -42,35 +40,29 @@ interface InviteWithCreator extends TInvite {
     email: string;
   };
 }
-export const getInvitesByOrganizationId = reactCache(
-  (organizationId: string, page?: number): Promise<TInvite[]> =>
-    cache(
-      async () => {
-        validateInputs([organizationId, ZString], [page, ZOptionalNumber]);
+export const getInvitesByOrganizationId = async (
+  organizationId: string,
+  page?: number
+): Promise<TInvite[]> => {
+  validateInputs([organizationId, ZString], [page, ZOptionalNumber]);
 
-        try {
-          const invites = await prisma.invite.findMany({
-            where: { organizationId },
-            select: inviteSelect,
-            take: page ? ITEMS_PER_PAGE : undefined,
-            skip: page ? ITEMS_PER_PAGE * (page - 1) : undefined,
-          });
+  try {
+    const invites = await prisma.invite.findMany({
+      where: { organizationId },
+      select: inviteSelect,
+      take: page ? ITEMS_PER_PAGE : undefined,
+      skip: page ? ITEMS_PER_PAGE * (page - 1) : undefined,
+    });
 
-          return invites;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
+    return invites;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
 
-          throw error;
-        }
-      },
-      [`getInvitesByOrganizationId-${organizationId}-${page}`],
-      {
-        tags: [inviteCache.tag.byOrganizationId(organizationId)],
-      }
-    )()
-);
+    throw error;
+  }
+};
 
 export const updateInvite = async (inviteId: string, data: TInviteUpdateInput): Promise<TInvite | null> => {
   validateInputs([inviteId, ZString], [data, ZInviteUpdateInput]);
@@ -130,42 +122,33 @@ export const deleteInvite = async (inviteId: string): Promise<TInvite> => {
   }
 };
 
-export const getInvite = reactCache(
-  (inviteId: string): Promise<InviteWithCreator | null> =>
-    cache(
-      async () => {
-        validateInputs([inviteId, ZString]);
+export const getInvite = async (inviteId: string): Promise<InviteWithCreator | null> => {
+  validateInputs([inviteId, ZString]);
 
-        try {
-          const invite = await prisma.invite.findUnique({
-            where: {
-              id: inviteId,
-            },
-            include: {
-              creator: {
-                select: {
-                  name: true,
-                  email: true,
-                },
-              },
-            },
-          });
-
-          return invite;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-
-          throw error;
-        }
+  try {
+    const invite = await prisma.invite.findUnique({
+      where: {
+        id: inviteId,
       },
-      [`getInvite-${inviteId}`],
-      {
-        tags: [inviteCache.tag.byId(inviteId)],
-      }
-    )()
-);
+      include: {
+        creator: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    return invite;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+
+    throw error;
+  }
+};
 
 export const resendInvite = async (inviteId: string): Promise<TInvite> => {
   validateInputs([inviteId, ZString]);

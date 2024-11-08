@@ -1,6 +1,5 @@
 import "server-only";
 import { Prisma } from "@prisma/client";
-import { cache as reactCache } from "react";
 import { z } from "zod";
 import { prisma } from "@formbricks/database";
 import { ZId } from "@formbricks/types/common";
@@ -15,89 +14,70 @@ import {
   ZEnvironmentUpdateInput,
 } from "@formbricks/types/environment";
 import { DatabaseError, ResourceNotFoundError, ValidationError } from "@formbricks/types/errors";
-import { cache } from "../cache";
 import { getOrganizationsByUserId } from "../organization/service";
 import { capturePosthogEnvironmentEvent } from "../posthogServer";
 import { getProducts } from "../product/service";
 import { validateInputs } from "../utils/validate";
 import { environmentCache } from "./cache";
 
-export const getEnvironment = reactCache(
-  (environmentId: string): Promise<TEnvironment | null> =>
-    cache(
-      async () => {
-        validateInputs([environmentId, ZId]);
+export const getEnvironment = async (environmentId: string): Promise<TEnvironment | null> => {
+  validateInputs([environmentId, ZId]);
 
-        try {
-          const environment = await prisma.environment.findUnique({
-            where: {
-              id: environmentId,
-            },
-          });
-          return environment;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            console.error(error);
-            throw new DatabaseError(error.message);
-          }
-
-          throw error;
-        }
+  try {
+    const environment = await prisma.environment.findUnique({
+      where: {
+        id: environmentId,
       },
-      [`getEnvironment-${environmentId}`],
-      {
-        tags: [environmentCache.tag.byId(environmentId)],
-      }
-    )()
-);
+    });
+    return environment;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      console.error(error);
+      throw new DatabaseError(error.message);
+    }
 
-export const getEnvironments = reactCache(
-  (productId: string): Promise<TEnvironment[]> =>
-    cache(
-      async (): Promise<TEnvironment[]> => {
-        validateInputs([productId, ZId]);
-        let productPrisma;
-        try {
-          productPrisma = await prisma.product.findFirst({
-            where: {
-              id: productId,
-            },
-            include: {
-              environments: true,
-            },
-          });
+    throw error;
+  }
+};
 
-          if (!productPrisma) {
-            throw new ResourceNotFoundError("Product", productId);
-          }
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-          throw error;
-        }
-
-        const environments: TEnvironment[] = [];
-        for (let environment of productPrisma.environments) {
-          let targetEnvironment: TEnvironment = ZEnvironment.parse(environment);
-          environments.push(targetEnvironment);
-        }
-
-        try {
-          return environments;
-        } catch (error) {
-          if (error instanceof z.ZodError) {
-            console.error(JSON.stringify(error.errors, null, 2));
-          }
-          throw new ValidationError("Data validation of environments array failed");
-        }
+export const getEnvironments = async (productId: string): Promise<TEnvironment[]> => {
+  validateInputs([productId, ZId]);
+  let productPrisma;
+  try {
+    productPrisma = await prisma.product.findFirst({
+      where: {
+        id: productId,
       },
-      [`getEnvironments-${productId}`],
-      {
-        tags: [environmentCache.tag.byProductId(productId)],
-      }
-    )()
-);
+      include: {
+        environments: true,
+      },
+    });
+
+    if (!productPrisma) {
+      throw new ResourceNotFoundError("Product", productId);
+    }
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+    throw error;
+  }
+
+  const environments: TEnvironment[] = [];
+  for (let environment of productPrisma.environments) {
+    let targetEnvironment: TEnvironment = ZEnvironment.parse(environment);
+    environments.push(targetEnvironment);
+  }
+
+  try {
+    return environments;
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error(JSON.stringify(error.errors, null, 2));
+    }
+    throw new ValidationError("Data validation of environments array failed");
+  }
+};
 
 export const updateEnvironment = async (
   environmentId: string,

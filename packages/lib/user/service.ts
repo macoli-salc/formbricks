@@ -1,6 +1,5 @@
 import "server-only";
 import { Prisma } from "@prisma/client";
-import { cache as reactCache } from "react";
 import { z } from "zod";
 import { prisma } from "@formbricks/database";
 import { ZId } from "@formbricks/types/common";
@@ -13,7 +12,6 @@ import {
   TUserUpdateInput,
   ZUserUpdateInput,
 } from "@formbricks/types/user";
-import { cache } from "../cache";
 import { createCustomerIoCustomer } from "../customerio";
 import { deleteMembership, updateMembership } from "../membership/service";
 import { deleteOrganization } from "../organization/service";
@@ -37,68 +35,50 @@ const responseSelection = {
 };
 
 // function to retrive basic information about a user's user
-export const getUser = reactCache(
-  (id: string): Promise<TUser | null> =>
-    cache(
-      async () => {
-        validateInputs([id, ZId]);
+export const getUser = async (id: string): Promise<TUser | null> => {
+  validateInputs([id, ZId]);
 
-        try {
-          const user = await prisma.user.findUnique({
-            where: {
-              id,
-            },
-            select: responseSelection,
-          });
-
-          if (!user) {
-            return null;
-          }
-          return user;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-
-          throw error;
-        }
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id,
       },
-      [`getUser-${id}`],
-      {
-        tags: [userCache.tag.byId(id)],
-      }
-    )()
-);
+      select: responseSelection,
+    });
 
-export const getUserByEmail = reactCache(
-  (email: string): Promise<TUser | null> =>
-    cache(
-      async () => {
-        validateInputs([email, z.string().email()]);
+    if (!user) {
+      return null;
+    }
+    return user;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
 
-        try {
-          const user = await prisma.user.findFirst({
-            where: {
-              email,
-            },
-            select: responseSelection,
-          });
+    throw error;
+  }
+};
 
-          return user;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
+export const getUserByEmail = async (email: string): Promise<TUser | null> => {
+  validateInputs([email, z.string().email()]);
 
-          throw error;
-        }
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        email,
       },
-      [`getUserByEmail-${email}`],
-      {
-        tags: [userCache.tag.byEmail(email)],
-      }
-    )()
-);
+      select: responseSelection,
+    });
+
+    return user;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+
+    throw error;
+  }
+};
 
 const getAdminMemberships = (memberships: TMembership[]): TMembership[] =>
   memberships.filter((membership) => membership.role === "admin");
@@ -293,35 +273,26 @@ export const userIdRelatedToApiKey = async (apiKey: string) => {
   }
 };
 
-export const getUserLocale = reactCache(
-  (id: string): Promise<TUserLocale | undefined> =>
-    cache(
-      async () => {
-        validateInputs([id, ZId]);
+export const getUserLocale = async (id: string): Promise<TUserLocale | undefined> => {
+  validateInputs([id, ZId]);
 
-        try {
-          const user = await prisma.user.findUnique({
-            where: {
-              id,
-            },
-            select: responseSelection,
-          });
-
-          if (!user) {
-            return undefined;
-          }
-          return user.locale;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-
-          throw error;
-        }
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id,
       },
-      [`getUserLocale-${id}`],
-      {
-        tags: [userCache.tag.byId(id)],
-      }
-    )()
-);
+      select: responseSelection,
+    });
+
+    if (!user) {
+      return undefined;
+    }
+    return user.locale;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+
+    throw error;
+  }
+};

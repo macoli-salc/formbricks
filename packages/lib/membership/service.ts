@@ -1,6 +1,5 @@
 import "server-only";
 import { Prisma } from "@prisma/client";
-import { cache as reactCache } from "react";
 import { prisma } from "@formbricks/database";
 import { ZOptionalNumber, ZString } from "@formbricks/types/common";
 import { DatabaseError, ResourceNotFoundError, UnknownError } from "@formbricks/types/errors";
@@ -11,128 +10,106 @@ import {
   ZMembership,
   ZMembershipUpdateInput,
 } from "@formbricks/types/memberships";
-import { cache } from "../cache";
 import { ITEMS_PER_PAGE } from "../constants";
 import { organizationCache } from "../organization/cache";
 import { validateInputs } from "../utils/validate";
 import { membershipCache } from "./cache";
 
-export const getMembersByOrganizationId = reactCache(
-  (organizationId: string, page?: number): Promise<TMember[]> =>
-    cache(
-      async () => {
-        validateInputs([organizationId, ZString], [page, ZOptionalNumber]);
+export const getMembersByOrganizationId = async (
+  organizationId: string,
+  page?: number
+): Promise<TMember[]> => {
+  validateInputs([organizationId, ZString], [page, ZOptionalNumber]);
 
-        try {
-          const membersData = await prisma.membership.findMany({
-            where: { organizationId },
-            select: {
-              user: {
-                select: {
-                  name: true,
-                  email: true,
-                },
-              },
-              userId: true,
-              accepted: true,
-              role: true,
-            },
-            take: page ? ITEMS_PER_PAGE : undefined,
-            skip: page ? ITEMS_PER_PAGE * (page - 1) : undefined,
-          });
-
-          const members = membersData.map((member) => {
-            return {
-              name: member.user?.name || "",
-              email: member.user?.email || "",
-              userId: member.userId,
-              accepted: member.accepted,
-              role: member.role,
-            };
-          });
-
-          return members;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            console.error(error);
-            throw new DatabaseError(error.message);
-          }
-
-          throw new UnknownError("Error while fetching members");
-        }
+  try {
+    const membersData = await prisma.membership.findMany({
+      where: { organizationId },
+      select: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+        userId: true,
+        accepted: true,
+        role: true,
       },
-      [`getMembersByOrganizationId-${organizationId}-${page}`],
-      {
-        tags: [membershipCache.tag.byOrganizationId(organizationId)],
-      }
-    )()
-);
+      take: page ? ITEMS_PER_PAGE : undefined,
+      skip: page ? ITEMS_PER_PAGE * (page - 1) : undefined,
+    });
 
-export const getMembershipByUserIdOrganizationId = reactCache(
-  (userId: string, organizationId: string): Promise<TMembership | null> =>
-    cache(
-      async () => {
-        validateInputs([userId, ZString], [organizationId, ZString]);
+    const members = membersData.map((member) => {
+      return {
+        name: member.user?.name || "",
+        email: member.user?.email || "",
+        userId: member.userId,
+        accepted: member.accepted,
+        role: member.role,
+      };
+    });
 
-        try {
-          const membership = await prisma.membership.findUnique({
-            where: {
-              userId_organizationId: {
-                userId,
-                organizationId,
-              },
-            },
-          });
+    return members;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      console.error(error);
+      throw new DatabaseError(error.message);
+    }
 
-          if (!membership) return null;
+    throw new UnknownError("Error while fetching members");
+  }
+};
 
-          return membership;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            console.error(error);
-            throw new DatabaseError(error.message);
-          }
+export const getMembershipByUserIdOrganizationId = async (
+  userId: string,
+  organizationId: string
+): Promise<TMembership | null> => {
+  validateInputs([userId, ZString], [organizationId, ZString]);
 
-          throw new UnknownError("Error while fetching membership");
-        }
+  try {
+    const membership = await prisma.membership.findUnique({
+      where: {
+        userId_organizationId: {
+          userId,
+          organizationId,
+        },
       },
-      [`getMembershipByUserIdOrganizationId-${userId}-${organizationId}`],
-      {
-        tags: [membershipCache.tag.byUserId(userId), membershipCache.tag.byOrganizationId(organizationId)],
-      }
-    )()
-);
+    });
 
-export const getMembershipsByUserId = reactCache(
-  (userId: string, page?: number): Promise<TMembership[]> =>
-    cache(
-      async () => {
-        validateInputs([userId, ZString], [page, ZOptionalNumber]);
+    if (!membership) return null;
 
-        try {
-          const memberships = await prisma.membership.findMany({
-            where: {
-              userId,
-            },
-            take: page ? ITEMS_PER_PAGE : undefined,
-            skip: page ? ITEMS_PER_PAGE * (page - 1) : undefined,
-          });
+    return membership;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      console.error(error);
+      throw new DatabaseError(error.message);
+    }
 
-          return memberships;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
+    throw new UnknownError("Error while fetching membership");
+  }
+};
 
-          throw error;
-        }
+export const getMembershipsByUserId = async (userId: string, page?: number): Promise<TMembership[]> => {
+  validateInputs([userId, ZString], [page, ZOptionalNumber]);
+
+  try {
+    const memberships = await prisma.membership.findMany({
+      where: {
+        userId,
       },
-      [`getMembershipsByUserId-${userId}-${page}`],
-      {
-        tags: [membershipCache.tag.byUserId(userId)],
-      }
-    )()
-);
+      take: page ? ITEMS_PER_PAGE : undefined,
+      skip: page ? ITEMS_PER_PAGE * (page - 1) : undefined,
+    });
+
+    return memberships;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+
+    throw error;
+  }
+};
 
 export const createMembership = async (
   organizationId: string,

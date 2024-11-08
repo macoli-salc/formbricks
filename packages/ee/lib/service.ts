@@ -1,60 +1,22 @@
 import "server-only";
-import { cache as reactCache } from "react";
-import { cache, revalidateTag } from "@formbricks/lib/cache";
 import {
   E2E_TESTING,
   ENTERPRISE_LICENSE_KEY,
   IS_FORMBRICKS_CLOUD,
   PRODUCT_FEATURE_KEYS,
 } from "@formbricks/lib/constants";
-import { hashString } from "@formbricks/lib/hashString";
 import { TOrganization } from "@formbricks/types/organizations";
 import { TEnterpriseLicenseDetails, TEnterpriseLicenseFeatures } from "./types";
 
-const hashedKey = ENTERPRISE_LICENSE_KEY ? hashString(ENTERPRISE_LICENSE_KEY) : undefined;
-const PREVIOUS_RESULTS_CACHE_TAG_KEY = `getPreviousResult-${hashedKey}` as const;
-
-// This function is used to get the previous result of the license check from the cache
-// This might seem confusing at first since we only return the default value from this function,
-// but since we are using a cache and the cache key is the same, the cache will return the previous result - so this function acts as a cache getter
-const getPreviousResult = (): Promise<{
+// Store previous result in memory
+let previousResult = {
+  active: null,
+  lastChecked: new Date(0),
+  features: null,
+} as {
   active: boolean | null;
   lastChecked: Date;
   features: TEnterpriseLicenseFeatures | null;
-}> =>
-  cache(
-    async () => ({
-      active: null,
-      lastChecked: new Date(0),
-      features: null,
-    }),
-    [PREVIOUS_RESULTS_CACHE_TAG_KEY],
-    {
-      tags: [PREVIOUS_RESULTS_CACHE_TAG_KEY],
-    }
-  )();
-
-// This function is used to set the previous result of the license check to the cache so that we can use it in the next call
-// Uses the same cache key as the getPreviousResult function
-const setPreviousResult = async (previousResult: {
-  active: boolean | null;
-  lastChecked: Date;
-  features: TEnterpriseLicenseFeatures | null;
-}) => {
-  revalidateTag(PREVIOUS_RESULTS_CACHE_TAG_KEY);
-  const { lastChecked, active, features } = previousResult;
-
-  await cache(
-    async () => ({
-      active,
-      lastChecked,
-      features,
-    }),
-    [PREVIOUS_RESULTS_CACHE_TAG_KEY],
-    {
-      tags: [PREVIOUS_RESULTS_CACHE_TAG_KEY],
-    }
-  )();
 };
 
 const fetchLicenseForE2ETesting = async (): Promise<{
@@ -64,7 +26,6 @@ const fetchLicenseForE2ETesting = async (): Promise<{
 } | null> => {
   const currentTime = new Date();
   try {
-    const previousResult = await getPreviousResult();
     if (previousResult.lastChecked.getTime() === new Date(0).getTime()) {
       // first call
       const newResult = {
@@ -72,7 +33,7 @@ const fetchLicenseForE2ETesting = async (): Promise<{
         features: { isMultiOrgEnabled: true },
         lastChecked: currentTime,
       };
-      await setPreviousResult(newResult);
+      previousResult = newResult;
       return newResult;
     } else if (currentTime.getTime() - previousResult.lastChecked.getTime() > 60 * 60 * 1000) {
       // Fail after 1 hour
@@ -101,25 +62,18 @@ export const getEnterpriseLicense = async (): Promise<{
   }
 
   if (E2E_TESTING) {
-    const previousResult = await fetchLicenseForE2ETesting();
-
+    const result = await fetchLicenseForE2ETesting();
     return {
-      active: previousResult?.active ?? false,
-      features: previousResult ? previousResult.features : null,
-      lastChecked: previousResult ? previousResult.lastChecked : new Date(),
+      active: result?.active ?? false,
+      features: result ? result.features : null,
+      lastChecked: result ? result.lastChecked : new Date(),
     };
   }
 
-  // if the server responds with a boolean, we return it
-  // if the server errors, we return null
-  // null signifies an error
   const license = await fetchLicense();
-
   const isValid = license ? license.status === "active" : null;
   const threeDaysInMillis = 3 * 24 * 60 * 60 * 1000;
   const currentTime = new Date();
-
-  const previousResult = await getPreviousResult();
 
   // Case: First time checking license and the server errors out
   if (previousResult.active === null) {
@@ -129,8 +83,7 @@ export const getEnterpriseLicense = async (): Promise<{
         features: { isMultiOrgEnabled: false },
         lastChecked: new Date(),
       };
-
-      await setPreviousResult(newResult);
+      previousResult = newResult;
       return newResult;
     }
   }
@@ -141,13 +94,9 @@ export const getEnterpriseLicense = async (): Promise<{
       features: license.features,
       lastChecked: new Date(),
     };
-
-    await setPreviousResult(newResult);
+    previousResult = newResult;
     return newResult;
   } else {
-    // if result is undefined -> error
-    // if the last check was less than 72 hours, return the previous value:
-
     const elapsedTime = currentTime.getTime() - previousResult.lastChecked.getTime();
     if (elapsedTime < threeDaysInMillis) {
       return {
@@ -158,7 +107,6 @@ export const getEnterpriseLicense = async (): Promise<{
       };
     }
 
-    // Log error only after 72 hours
     console.error("Error while checking license: The license check failed");
 
     return {
@@ -171,35 +119,27 @@ export const getEnterpriseLicense = async (): Promise<{
 };
 
 export const getLicenseFeatures = async (): Promise<TEnterpriseLicenseFeatures | null> => {
-  const previousResult = await getPreviousResult();
   if (previousResult.features) {
     return previousResult.features;
-  } else {
-    const license = await fetchLicense();
-    if (!license || !license.features) return null;
-    return license.features;
   }
+
+  const license = await fetchLicense();
+  if (!license || !license.features) return null;
+  return license.features;
 };
 
-export const fetchLicense = reactCache(
-  (): Promise<TEnterpriseLicenseDetails | null> =>
-    cache(
-      async () => {
-        try {
-          const result = {
-            status: "active",
-            features: { isMultiOrgEnabled: true },
-          } as TEnterpriseLicenseDetails;
-          return result;
-        } catch (error) {
-          console.error("Error while checking license: ", error);
-          return null;
-        }
-      },
-      [`fetchLicense-${hashedKey}`],
-      { revalidate: 60 * 60 * 24 }
-    )()
-);
+export const fetchLicense = async (): Promise<TEnterpriseLicenseDetails | null> => {
+  try {
+    const result = {
+      status: "active",
+      features: { isMultiOrgEnabled: true },
+    } as TEnterpriseLicenseDetails;
+    return result;
+  } catch (error) {
+    console.error("Error while checking license: ", error);
+    return null;
+  }
+};
 
 export const getRemoveInAppBrandingPermission = (organization: TOrganization): boolean => {
   if (IS_FORMBRICKS_CLOUD) return organization.billing.plan !== PRODUCT_FEATURE_KEYS.FREE;
@@ -255,8 +195,8 @@ export const getMultiLanguagePermission = async (organization: TOrganization): P
 
 export const getIsMultiOrgEnabled = async (): Promise<boolean> => {
   if (E2E_TESTING) {
-    const previousResult = await fetchLicenseForE2ETesting();
-    return previousResult && previousResult.features ? previousResult.features.isMultiOrgEnabled : false;
+    const result = await fetchLicenseForE2ETesting();
+    return result && result.features ? result.features.isMultiOrgEnabled : false;
   }
   const licenseFeatures = await getLicenseFeatures();
   if (!licenseFeatures) return false;

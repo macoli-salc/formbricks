@@ -5,7 +5,6 @@ import { getIsAIEnabled } from "@/app/lib/utils";
 import { headers } from "next/headers";
 import { prisma } from "@formbricks/database";
 import { sendResponseFinishedEmail } from "@formbricks/email";
-import { cache } from "@formbricks/lib/cache";
 import { CRON_SECRET, IS_AI_CONFIGURED } from "@formbricks/lib/constants";
 import { getIntegrations } from "@formbricks/lib/integration/service";
 import { getOrganizationByEnvironmentId } from "@formbricks/lib/organization/service";
@@ -13,8 +12,7 @@ import { getResponseCountBySurveyId } from "@formbricks/lib/response/service";
 import { getSurvey, updateSurvey } from "@formbricks/lib/survey/service";
 import { convertDatesInObject } from "@formbricks/lib/time";
 import { getPromptText } from "@formbricks/lib/utils/ai";
-import { webhookCache } from "@formbricks/lib/webhook/cache";
-import { TPipelineTrigger, ZPipelineInput } from "@formbricks/types/pipelines";
+import { ZPipelineInput } from "@formbricks/types/pipelines";
 import { TWebhook } from "@formbricks/types/webhooks";
 import { handleIntegrations } from "./lib/handleIntegrations";
 
@@ -40,27 +38,16 @@ export const POST = async (request: Request) => {
 
   const { environmentId, surveyId, event, response } = inputValidation.data;
 
-  // Fetch webhooks
-  const getWebhooksForPipeline = cache(
-    async (environmentId: string, event: TPipelineTrigger, surveyId: string) => {
-      const webhooks = await prisma.webhook.findMany({
-        where: {
-          environmentId,
-          triggers: { has: event },
-          OR: [{ surveyIds: { has: surveyId } }, { surveyIds: { isEmpty: true } }],
-        },
-      });
-      return webhooks;
+  // Fetch webhooks directly from the database
+  const webhooks: TWebhook[] = await prisma.webhook.findMany({
+    where: {
+      environmentId,
+      triggers: { has: event },
+      OR: [{ surveyIds: { has: surveyId } }, { surveyIds: { isEmpty: true } }],
     },
-    [`getWebhooksForPipeline-${environmentId}-${event}-${surveyId}`],
-    {
-      tags: [webhookCache.tag.byEnvironmentId(environmentId)],
-    }
-  );
-  const webhooks: TWebhook[] = await getWebhooksForPipeline(environmentId, event, surveyId);
-  // Prepare webhook and email promises
+  });
 
-  // Fetch with timeout of 5 seconds to prevent hanging
+  // Prepare webhook and email promises
   const fetchWithTimeout = (url: string, options: RequestInit, timeout: number = 5000): Promise<Response> => {
     return Promise.race([
       fetch(url, options),
@@ -99,8 +86,6 @@ export const POST = async (request: Request) => {
       await handleIntegrations(integrations, inputValidation.data, survey);
     }
 
-    // Fetch users with notifications in a single query
-    // TODO: add cache for this query. Not possible at the moment since we can't get the membership cache by environmentId
     const usersWithNotifications = await prisma.user.findMany({
       where: {
         memberships: {
@@ -172,7 +157,6 @@ export const POST = async (request: Request) => {
                 continue;
               }
               const text = getPromptText(question.headline.default, response.data[question.id] as string);
-              // TODO: check if subheadline gives more context and better embeddings
               try {
                 await createDocumentAndAssignInsight(survey.name, {
                   environmentId,
@@ -190,7 +174,7 @@ export const POST = async (request: Request) => {
       }
     }
   } else {
-    // Await webhook promises if no emails are sent (with allSettled to prevent early rejection)
+    // Await webhook promises if no emails are sent
     const results = await Promise.allSettled(webhookPromises);
     results.forEach((result) => {
       if (result.status === "rejected") {

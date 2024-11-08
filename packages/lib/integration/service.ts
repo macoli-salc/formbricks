@@ -1,28 +1,13 @@
 import "server-only";
 import { Prisma } from "@prisma/client";
-import { cache as reactCache } from "react";
 import { prisma } from "@formbricks/database";
 import { ZOptionalNumber, ZString } from "@formbricks/types/common";
 import { ZId } from "@formbricks/types/common";
 import { DatabaseError } from "@formbricks/types/errors";
 import { TIntegration, TIntegrationInput, ZIntegrationType } from "@formbricks/types/integration";
-import { cache } from "../cache";
 import { ITEMS_PER_PAGE } from "../constants";
 import { validateInputs } from "../utils/validate";
 import { integrationCache } from "./cache";
-
-const transformIntegration = (integration: TIntegration): TIntegration => {
-  return {
-    ...integration,
-    config: {
-      ...integration.config,
-      data: integration.config.data.map((data) => ({
-        ...data,
-        createdAt: new Date(data.createdAt),
-      })),
-    },
-  };
-};
 
 export const createOrUpdateIntegration = async (
   environmentId: string,
@@ -62,95 +47,65 @@ export const createOrUpdateIntegration = async (
   }
 };
 
-export const getIntegrations = reactCache(
-  (environmentId: string, page?: number): Promise<TIntegration[]> =>
-    cache(
-      async () => {
-        validateInputs([environmentId, ZId], [page, ZOptionalNumber]);
+export const getIntegrations = async (environmentId: string, page?: number): Promise<TIntegration[]> => {
+  validateInputs([environmentId, ZId], [page, ZOptionalNumber]);
 
-        try {
-          const integrations = await prisma.integration.findMany({
-            where: {
-              environmentId,
-            },
-            take: page ? ITEMS_PER_PAGE : undefined,
-            skip: page ? ITEMS_PER_PAGE * (page - 1) : undefined,
-          });
-          return integrations;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-          throw error;
-        }
+  try {
+    const integrations = await prisma.integration.findMany({
+      where: {
+        environmentId,
       },
-      [`getIntegrations-${environmentId}-${page}`],
-      {
-        tags: [integrationCache.tag.byEnvironmentId(environmentId)],
-      }
-    )().then((cachedIntegration) => {
-      return cachedIntegration.map((integration) => transformIntegration(integration));
-    })
-);
+      take: page ? ITEMS_PER_PAGE : undefined,
+      skip: page ? ITEMS_PER_PAGE * (page - 1) : undefined,
+    });
+    return integrations;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+    throw error;
+  }
+};
 
-export const getIntegration = reactCache(
-  (integrationId: string): Promise<TIntegration | null> =>
-    cache(
-      async () => {
-        try {
-          const integration = await prisma.integration.findUnique({
-            where: {
-              id: integrationId,
-            },
-          });
-          return integration;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-          throw error;
-        }
+export const getIntegration = async (integrationId: string): Promise<TIntegration | null> => {
+  try {
+    const integration = await prisma.integration.findUnique({
+      where: {
+        id: integrationId,
       },
-      [`getIntegration-${integrationId}`],
-      {
-        tags: [integrationCache.tag.byId(integrationId)],
-      }
-    )()
-);
+    });
+    return integration;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+    throw error;
+  }
+};
 
-export const getIntegrationByType = reactCache(
-  (environmentId: string, type: TIntegrationInput["type"]): Promise<TIntegration | null> =>
-    cache(
-      async () => {
-        validateInputs([environmentId, ZId], [type, ZIntegrationType]);
+export const getIntegrationByType = async (
+  environmentId: string,
+  type: TIntegrationInput["type"]
+): Promise<TIntegration | null> => {
+  validateInputs([environmentId, ZId], [type, ZIntegrationType]);
 
-        try {
-          const integration = await prisma.integration.findUnique({
-            where: {
-              type_environmentId: {
-                environmentId,
-                type,
-              },
-            },
-          });
-          return integration;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-          throw error;
-        }
+  try {
+    const integration = await prisma.integration.findUnique({
+      where: {
+        type_environmentId: {
+          environmentId,
+          type,
+        },
       },
-      [`getIntegrationByType-${environmentId}-${type}`],
-      {
-        tags: [integrationCache.tag.byEnvironmentIdAndType(environmentId, type)],
-      }
-    )().then((cachedIntegration) => {
-      if (cachedIntegration) {
-        return transformIntegration(cachedIntegration);
-      } else return null;
-    })
-);
+    });
+    return integration;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+    throw error;
+  }
+};
 
 export const deleteIntegration = async (integrationId: string): Promise<TIntegration> => {
   validateInputs([integrationId, ZString]);

@@ -1,40 +1,30 @@
 import "server-only";
 import { ZId } from "@formbricks/types/common";
-import { cache } from "../cache";
 import { hasUserEnvironmentAccess } from "../environment/auth";
 import { getMembershipByUserIdOrganizationId } from "../membership/service";
 import { getAccessFlags } from "../membership/utils";
 import { getOrganizationByEnvironmentId } from "../organization/service";
 import { validateInputs } from "../utils/validate";
-import { actionClassCache } from "./cache";
 import { getActionClass } from "./service";
 
-export const canUserUpdateActionClass = (userId: string, actionClassId: string): Promise<boolean> =>
-  cache(
-    async () => {
-      validateInputs([userId, ZId], [actionClassId, ZId]);
+export const canUserUpdateActionClass = async (userId: string, actionClassId: string): Promise<boolean> => {
+  validateInputs([userId, ZId], [actionClassId, ZId]);
 
-      try {
-        if (!userId) return false;
+  try {
+    if (!userId) return false;
 
-        const actionClass = await getActionClass(actionClassId);
-        if (!actionClass) return false;
+    const actionClass = await getActionClass(actionClassId);
+    if (!actionClass) return false;
 
-        const hasAccessToEnvironment = await hasUserEnvironmentAccess(userId, actionClass.environmentId);
+    const hasAccessToEnvironment = await hasUserEnvironmentAccess(userId, actionClass.environmentId);
 
-        if (!hasAccessToEnvironment) return false;
+    if (!hasAccessToEnvironment) return false;
 
-        return true;
-      } catch (error) {
-        throw error;
-      }
-    },
-
-    [`canUserUpdateActionClass-${userId}-${actionClassId}`],
-    {
-      tags: [actionClassCache.tag.byId(actionClassId)],
-    }
-  )();
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
 
 export const verifyUserRoleAccess = async (
   environmentId: string,

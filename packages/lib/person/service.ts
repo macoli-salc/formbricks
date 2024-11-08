@@ -1,12 +1,10 @@
 import "server-only";
 import { Prisma } from "@prisma/client";
-import { cache as reactCache } from "react";
 import { prisma } from "@formbricks/database";
 import { ZOptionalNumber, ZOptionalString, ZString } from "@formbricks/types/common";
 import { ZId } from "@formbricks/types/common";
 import { DatabaseError, ResourceNotFoundError } from "@formbricks/types/errors";
 import { TPerson, TPersonWithAttributes } from "@formbricks/types/people";
-import { cache } from "../cache";
 import { ITEMS_PER_PAGE } from "../constants";
 import { validateInputs } from "../utils/validate";
 import { personCache } from "./cache";
@@ -62,33 +60,24 @@ export const transformPrismaPerson = (person: TransformPersonInput): TPersonWith
   } as TPersonWithAttributes;
 };
 
-export const getPerson = reactCache(
-  (personId: string): Promise<TPerson | null> =>
-    cache(
-      async () => {
-        validateInputs([personId, ZId]);
+export const getPerson = async (personId: string): Promise<TPerson | null> => {
+  validateInputs([personId, ZId]);
 
-        try {
-          return await prisma.person.findUnique({
-            where: {
-              id: personId,
-            },
-            select: selectPerson,
-          });
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-
-          throw error;
-        }
+  try {
+    return await prisma.person.findUnique({
+      where: {
+        id: personId,
       },
-      [`getPerson-${personId}`],
-      {
-        tags: [personCache.tag.byId(personId)],
-      }
-    )()
-);
+      select: selectPerson,
+    });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+
+    throw error;
+  }
+};
 
 const buildPersonWhereClause = (environmentId: string, search?: string): Prisma.PersonWhereInput => ({
   environmentId: environmentId,
@@ -118,59 +107,45 @@ const buildPersonWhereClause = (environmentId: string, search?: string): Prisma.
   ],
 });
 
-export const getPeople = reactCache(
-  (environmentId: string, offset?: number, searchValue?: string): Promise<TPersonWithAttributes[]> =>
-    cache(
-      async () => {
-        validateInputs([environmentId, ZId], [offset, ZOptionalNumber], [searchValue, ZOptionalString]);
-        try {
-          const persons = await prisma.person.findMany({
-            where: buildPersonWhereClause(environmentId, searchValue),
-            select: selectPerson,
-            take: ITEMS_PER_PAGE,
-            skip: offset,
-          });
+export const getPeople = async (
+  environmentId: string,
+  offset?: number,
+  searchValue?: string
+): Promise<TPersonWithAttributes[]> => {
+  validateInputs([environmentId, ZId], [offset, ZOptionalNumber], [searchValue, ZOptionalString]);
+  try {
+    const persons = await prisma.person.findMany({
+      where: buildPersonWhereClause(environmentId, searchValue),
+      select: selectPerson,
+      take: ITEMS_PER_PAGE,
+      skip: offset,
+    });
 
-          return persons.map((person) => transformPrismaPerson(person));
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
+    return persons.map((person) => transformPrismaPerson(person));
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
 
-          throw error;
-        }
-      },
-      [`getPeople-${environmentId}-${offset}-${searchValue ?? ""}`],
-      {
-        tags: [personCache.tag.byEnvironmentId(environmentId)],
-      }
-    )()
-);
+    throw error;
+  }
+};
 
-export const getPersonCount = reactCache(
-  (environmentId: string, searchValue?: string): Promise<number> =>
-    cache(
-      async () => {
-        validateInputs([environmentId, ZId], [searchValue, ZOptionalString]);
+export const getPersonCount = async (environmentId: string, searchValue?: string): Promise<number> => {
+  validateInputs([environmentId, ZId], [searchValue, ZOptionalString]);
 
-        try {
-          return await prisma.person.count({
-            where: buildPersonWhereClause(environmentId, searchValue),
-          });
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
+  try {
+    return await prisma.person.count({
+      where: buildPersonWhereClause(environmentId, searchValue),
+    });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
 
-          throw error;
-        }
-      },
-      [`getPersonCount-${environmentId}-${searchValue ?? ""}`],
-      {
-        tags: [personCache.tag.byEnvironmentId(environmentId)],
-      }
-    )()
-);
+    throw error;
+  }
+};
 
 export const createPerson = async (environmentId: string, userId: string): Promise<TPerson> => {
   validateInputs([environmentId, ZId]);
@@ -247,40 +222,31 @@ export const deletePerson = async (personId: string): Promise<TPerson | null> =>
   }
 };
 
-export const getPersonByUserId = reactCache(
-  (environmentId: string, userId: string): Promise<TPerson | null> =>
-    cache(
-      async () => {
-        validateInputs([environmentId, ZId], [userId, ZString]);
+export const getPersonByUserId = async (environmentId: string, userId: string): Promise<TPerson | null> => {
+  validateInputs([environmentId, ZId], [userId, ZString]);
 
-        const environment = await prisma.environment.findUnique({
-          where: {
-            id: environmentId,
-          },
-        });
+  const environment = await prisma.environment.findUnique({
+    where: {
+      id: environmentId,
+    },
+  });
 
-        if (!environment) {
-          throw new ResourceNotFoundError("environment", environmentId);
-        }
+  if (!environment) {
+    throw new ResourceNotFoundError("environment", environmentId);
+  }
 
-        // check if userId exists as a column
-        const personWithUserId = await prisma.person.findFirst({
-          where: {
-            environmentId,
-            userId,
-          },
-          select: selectPerson,
-        });
+  // check if userId exists as a column
+  const personWithUserId = await prisma.person.findFirst({
+    where: {
+      environmentId,
+      userId,
+    },
+    select: selectPerson,
+  });
 
-        if (personWithUserId) {
-          return personWithUserId;
-        }
+  if (personWithUserId) {
+    return personWithUserId;
+  }
 
-        return null;
-      },
-      [`getPersonByUserId-${environmentId}-${userId}`],
-      {
-        tags: [personCache.tag.byEnvironmentIdAndUserId(environmentId, userId)],
-      }
-    )()
-);
+  return null;
+};

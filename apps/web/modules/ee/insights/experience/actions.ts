@@ -1,11 +1,9 @@
 "use server";
 
-import { insightCache } from "@/lib/cache/insight";
 import { z } from "zod";
 import { prisma } from "@formbricks/database";
 import { authenticatedActionClient } from "@formbricks/lib/actionClient";
 import { checkAuthorization } from "@formbricks/lib/actionClient/utils";
-import { cache } from "@formbricks/lib/cache";
 import { getOrganizationIdFromEnvironmentId } from "@formbricks/lib/organization/utils";
 import { ZId } from "@formbricks/types/common";
 import { ZInsight, ZInsightFilterCriteria } from "@formbricks/types/insights";
@@ -62,21 +60,14 @@ export const updateInsightAction = authenticatedActionClient
   .schema(ZUpdateInsightAction)
   .action(async ({ ctx, parsedInput }) => {
     try {
-      const insight = await cache(
-        () =>
-          prisma.insight.findUnique({
-            where: {
-              id: parsedInput.insightId,
-            },
-            select: {
-              environmentId: true,
-            },
-          }),
-        [`getInsight-${parsedInput.insightId}`],
-        {
-          tags: [insightCache.tag.byId(parsedInput.insightId)],
-        }
-      )();
+      const insight = await prisma.insight.findUnique({
+        where: {
+          id: parsedInput.insightId,
+        },
+        select: {
+          environmentId: true,
+        },
+      });
 
       if (!insight) {
         throw new Error("Insight not found");
@@ -94,6 +85,7 @@ export const updateInsightAction = authenticatedActionClient
         insightId: parsedInput.insightId,
         error,
       });
+
       if (error instanceof Error) {
         throw new Error(`Failed to update insight: ${error.message}`);
       }
