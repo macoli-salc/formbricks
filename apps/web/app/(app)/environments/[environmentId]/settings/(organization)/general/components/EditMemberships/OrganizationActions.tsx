@@ -51,7 +51,6 @@ export const OrganizationActions = ({
     try {
       await leaveOrganizationAction({ organizationId: organization.id });
       toast.success(t("environments.settings.general.member_deleted_successfully"));
-      router.refresh();
       setLoading(false);
       router.push("/");
     } catch (err) {
