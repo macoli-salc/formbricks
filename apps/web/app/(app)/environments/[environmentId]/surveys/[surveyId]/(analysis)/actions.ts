@@ -1,7 +1,7 @@
 "use server";
 
 import { generateInsightsForSurvey } from "@/app/api/(internal)/insights/lib/utils";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { authenticatedActionClient } from "@formbricks/lib/actionClient";
 import { checkAuthorization } from "@formbricks/lib/actionClient/utils";
@@ -11,14 +11,8 @@ import { ZId } from "@formbricks/types/common";
 import { ZResponseFilterCriteria } from "@formbricks/types/responses";
 import { getSurveySummary } from "./summary/lib/surveySummary";
 
-const revalidateSurveyCache = async (surveyId: string) => {
-  // Revalidate by survey ID pattern to catch all related pages
-  revalidatePath(`/[environmentId]/surveys/${surveyId}`);
-  revalidatePath(`/surveys/${surveyId}`);
-
-  // Revalidate tags
-  revalidateTag(`survey-${surveyId}`);
-  revalidateTag(`responses-${surveyId}`);
+export const revalidateSurveyIdPath = async (environmentId: string, surveyId: string) => {
+  revalidatePath(`/environments/${environmentId}/surveys/${surveyId}`);
 };
 
 const ZGetResponsesAction = z.object({
@@ -31,24 +25,18 @@ const ZGetResponsesAction = z.object({
 export const getResponsesAction = authenticatedActionClient
   .schema(ZGetResponsesAction)
   .action(async ({ ctx, parsedInput }) => {
-    const organizationId = await getOrganizationIdFromSurveyId(parsedInput.surveyId);
-
     await checkAuthorization({
       userId: ctx.user.id,
-      organizationId,
+      organizationId: await getOrganizationIdFromSurveyId(parsedInput.surveyId),
       rules: ["response", "read"],
     });
 
-    const responses = await getResponses(
+    return getResponses(
       parsedInput.surveyId,
       parsedInput.limit,
       parsedInput.offset,
       parsedInput.filterCriteria
     );
-
-    await revalidateSurveyCache(parsedInput.surveyId);
-
-    return responses;
   });
 
 const ZGetSurveySummaryAction = z.object({
@@ -59,19 +47,13 @@ const ZGetSurveySummaryAction = z.object({
 export const getSurveySummaryAction = authenticatedActionClient
   .schema(ZGetSurveySummaryAction)
   .action(async ({ ctx, parsedInput }) => {
-    const organizationId = await getOrganizationIdFromSurveyId(parsedInput.surveyId);
-
     await checkAuthorization({
       userId: ctx.user.id,
-      organizationId,
+      organizationId: await getOrganizationIdFromSurveyId(parsedInput.surveyId),
       rules: ["response", "read"],
     });
 
-    const summary = await getSurveySummary(parsedInput.surveyId, parsedInput.filterCriteria);
-
-    await revalidateSurveyCache(parsedInput.surveyId);
-
-    return summary;
+    return getSurveySummary(parsedInput.surveyId, parsedInput.filterCriteria);
   });
 
 const ZGetResponseCountAction = z.object({
@@ -82,19 +64,13 @@ const ZGetResponseCountAction = z.object({
 export const getResponseCountAction = authenticatedActionClient
   .schema(ZGetResponseCountAction)
   .action(async ({ ctx, parsedInput }) => {
-    const organizationId = await getOrganizationIdFromSurveyId(parsedInput.surveyId);
-
     await checkAuthorization({
       userId: ctx.user.id,
-      organizationId,
+      organizationId: await getOrganizationIdFromSurveyId(parsedInput.surveyId),
       rules: ["response", "read"],
     });
 
-    const count = await getResponseCountBySurveyId(parsedInput.surveyId, parsedInput.filterCriteria);
-
-    await revalidateSurveyCache(parsedInput.surveyId);
-
-    return count;
+    return getResponseCountBySurveyId(parsedInput.surveyId, parsedInput.filterCriteria);
   });
 
 const ZGenerateInsightsForSurveyAction = z.object({
@@ -104,15 +80,11 @@ const ZGenerateInsightsForSurveyAction = z.object({
 export const generateInsightsForSurveyAction = authenticatedActionClient
   .schema(ZGenerateInsightsForSurveyAction)
   .action(async ({ ctx, parsedInput }) => {
-    const organizationId = await getOrganizationIdFromSurveyId(parsedInput.surveyId);
-
     await checkAuthorization({
       userId: ctx.user.id,
-      organizationId,
+      organizationId: await getOrganizationIdFromSurveyId(parsedInput.surveyId),
       rules: ["survey", "update"],
     });
 
-    await generateInsightsForSurvey(parsedInput.surveyId);
-
-    await revalidateSurveyCache(parsedInput.surveyId);
+    generateInsightsForSurvey(parsedInput.surveyId);
   });
