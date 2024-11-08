@@ -75,7 +75,7 @@ export const EditProfileAvatarForm = ({ session, environmentId, imageUrl }: Edit
       router.refresh();
     } catch (err) {
       console.log({ err });
-      toast.error(t("environments.settings.profile.avatar_update_failed"));
+      toast.error(t("avatar_update_failed"));
       setIsLoading(false);
     }
 
@@ -88,7 +88,8 @@ export const EditProfileAvatarForm = ({ session, environmentId, imageUrl }: Edit
     try {
       await removeAvatarAction({ environmentId });
     } catch (err) {
-      toast.error(t("environments.settings.profile.avatar_update_failed"));
+      console.log({ err });
+      toast.error(t("avatar_update_failed"));
     } finally {
       setIsLoading(false);
       form.reset();
