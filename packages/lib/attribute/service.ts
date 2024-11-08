@@ -37,7 +37,7 @@ const convertPrismaAttributes = (prismaAttributes: any): TAttributes => {
   );
 };
 
-export const getAttributes = async (personId: string): Promise<TAttributes | null> => {
+export const getAttributes = async (personId: string): Promise<TAttributes> => {
   validateInputs([personId, ZId]);
 
   try {
@@ -58,10 +58,7 @@ export const getAttributes = async (personId: string): Promise<TAttributes | nul
   }
 };
 
-export const getAttributesByUserId = async (
-  environmentId: string,
-  userId: string
-): Promise<TAttributes | null> => {
+export const getAttributesByUserId = async (environmentId: string, userId: string): Promise<TAttributes> => {
   validateInputs([environmentId, ZId], [userId, ZString]);
 
   const person = await getPersonByUserId(environmentId, userId);
