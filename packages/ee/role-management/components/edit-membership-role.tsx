@@ -127,7 +127,7 @@ export function EditMembershipRole({
                 }}
                 value={capitalizeFirstLetter(memberRole)}>
                 {getMembershipRoles().map((role) => (
-                  <DropdownMenuRadioItem className="capitalize" key={role} value={role}>
+                  <DropdownMenuRadioItem className="" key={role} value={role}>
                     {role.toLowerCase()}
                   </DropdownMenuRadioItem>
                 ))}

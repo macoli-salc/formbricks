@@ -139,7 +139,7 @@ export const PersonSegmentFilter = ({
         }}
         disabled={viewOnly}>
         <SelectTrigger
-          className="flex w-auto items-center justify-center whitespace-nowrap bg-white capitalize"
+          className="flex w-auto items-center justify-center whitespace-nowrap bg-white"
           hideArrow>
           <SelectValue>
             <div className="flex items-center gap-1 lowercase">

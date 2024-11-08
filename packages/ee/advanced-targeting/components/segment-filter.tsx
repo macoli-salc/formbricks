@@ -308,7 +308,7 @@ function AttributeSegmentFilter({
         }}
         value={attributeClass}>
         <SelectTrigger
-          className="flex w-auto items-center justify-center whitespace-nowrap bg-white capitalize"
+          className="flex w-auto items-center justify-center whitespace-nowrap bg-white"
           hideArrow>
           <SelectValue>
             <div
@@ -493,7 +493,7 @@ function PersonSegmentFilter({
         }}
         value={personIdentifier}>
         <SelectTrigger
-          className="flex w-auto items-center justify-center whitespace-nowrap bg-white capitalize"
+          className="flex w-auto items-center justify-center whitespace-nowrap bg-white"
           hideArrow>
           <SelectValue>
             <div className="flex items-center gap-1 lowercase">
@@ -642,7 +642,7 @@ function SegmentSegmentFilter({
         }}
         value={currentSegment?.id}>
         <SelectTrigger
-          className="flex w-auto items-center justify-center whitespace-nowrap bg-white capitalize"
+          className="flex w-auto items-center justify-center whitespace-nowrap bg-white"
           hideArrow>
           <div className="flex items-center gap-1">
             <Users2Icon className="h-4 w-4 text-sm" />

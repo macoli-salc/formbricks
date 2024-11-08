@@ -83,7 +83,7 @@ export const ExperiencePageStats = ({ statsFrom, environmentId }: ExperiencePage
             <stat.icon className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent className="flex items-center justify-between">
-            <div className="text-2xl font-bold capitalize">
+            <div className="text-2xl font-bold">
               {isLoading ? (
                 <div className={cn("h-4 animate-pulse rounded-full bg-slate-200", stat.width)}></div>
               ) : stat.key === "sentimentScore" ? (

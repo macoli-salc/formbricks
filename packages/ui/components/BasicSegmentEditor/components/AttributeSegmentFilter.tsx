@@ -144,7 +144,7 @@ export const AttributeSegmentFilter = ({
         }}
         disabled={viewOnly}>
         <SelectTrigger
-          className="flex w-auto items-center justify-center whitespace-nowrap bg-white capitalize"
+          className="flex w-auto items-center justify-center whitespace-nowrap bg-white"
           hideArrow>
           <SelectValue>
             <div

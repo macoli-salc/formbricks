@@ -82,7 +82,7 @@ export const NPSSummary = ({
               className={`mb-2 flex justify-between ${group === "dismissed" ? "mb-2 border-t bg-white pt-4 text-sm md:text-base" : ""}`}>
               <div className="mr-8 flex space-x-1">
                 <p
-                  className={`font-semibold capitalize text-slate-700 ${group === "dismissed" ? "" : "text-slate-700"}`}>
+                  className={`font-semibold text-slate-700 ${group === "dismissed" ? "" : "text-slate-700"}`}>
                   {group}
                 </p>
                 <div>

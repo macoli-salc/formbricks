@@ -39,13 +39,13 @@ export function AddMemberRole({ control, canDoRoleManagement }: AddMemberRolePro
               onChange(v as MembershipRole);
             }}
             value={value}>
-            <SelectTrigger className="capitalize">
+            <SelectTrigger className="">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 {Object.values(MembershipRole).map((role) => (
-                  <SelectItem className="capitalize" key={role} value={role}>
+                  <SelectItem className="" key={role} value={role}>
                     {role}
                   </SelectItem>
                 ))}

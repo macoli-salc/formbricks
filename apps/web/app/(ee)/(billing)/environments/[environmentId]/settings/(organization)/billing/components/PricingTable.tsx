@@ -173,7 +173,7 @@ export const PricingTable = ({
             )}
           </div>
 
-          <div className="mt-2 flex flex-col rounded-xl border border-slate-200 bg-white py-4 capitalize shadow-sm dark:bg-slate-800">
+          <div className="mt-2 flex flex-col rounded-xl border border-slate-200 bg-white py-4 shadow-sm dark:bg-slate-800">
             <div
               className={cn(
                 "relative mx-8 mb-8 flex flex-col gap-4",

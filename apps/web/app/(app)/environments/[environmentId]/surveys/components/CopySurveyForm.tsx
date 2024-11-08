@@ -109,7 +109,7 @@ export const CopySurveyForm = ({
                                         id={environment.id}
                                       />
                                       <Label htmlFor={environment.id}>
-                                        <p className="text-sm font-medium capitalize text-slate-900">
+                                        <p className="text-sm font-medium text-slate-900">
                                           {environment.type}
                                         </p>
                                       </Label>
