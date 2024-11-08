@@ -1,6 +1,5 @@
 import "server-only";
 import { Prisma } from "@prisma/client";
-import { cache as reactCache } from "react";
 import { prisma } from "@formbricks/database";
 import { ZOptionalNumber, ZString } from "@formbricks/types/common";
 import { ZId } from "@formbricks/types/common";
@@ -12,7 +11,6 @@ import {
   ZOrganizationCreateInput,
 } from "@formbricks/types/organizations";
 import { TUserNotificationSettings } from "@formbricks/types/user";
-import { cache } from "../cache";
 import { BILLING_LIMITS, ITEMS_PER_PAGE, PRODUCT_FEATURE_KEYS } from "../constants";
 import { environmentCache } from "../environment/cache";
 import { getProducts } from "../product/service";
@@ -34,111 +32,86 @@ export const getOrganizationsByUserIdCacheTag = (userId: string) => `users-${use
 export const getOrganizationByEnvironmentIdCacheTag = (environmentId: string) =>
   `environments-${environmentId}-organization`;
 
-export const getOrganizationsByUserId = reactCache(
-  (userId: string, page?: number): Promise<TOrganization[]> =>
-    cache(
-      async () => {
-        validateInputs([userId, ZString], [page, ZOptionalNumber]);
+export const getOrganizationsByUserId = async (userId: string, page?: number): Promise<TOrganization[]> => {
+  validateInputs([userId, ZString], [page, ZOptionalNumber]);
 
-        try {
-          const organizations = await prisma.organization.findMany({
-            where: {
-              memberships: {
-                some: {
-                  userId,
-                },
+  try {
+    const organizations = await prisma.organization.findMany({
+      where: {
+        memberships: {
+          some: {
+            userId,
+          },
+        },
+      },
+      select,
+      take: page ? ITEMS_PER_PAGE : undefined,
+      skip: page ? ITEMS_PER_PAGE * (page - 1) : undefined,
+    });
+    if (!organizations) {
+      throw new ResourceNotFoundError("Organizations by UserId", userId);
+    }
+    return organizations;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+
+    throw error;
+  }
+};
+
+export const getOrganizationByEnvironmentId = async (
+  environmentId: string
+): Promise<TOrganization | null> => {
+  validateInputs([environmentId, ZId]);
+
+  try {
+    const organization = await prisma.organization.findFirst({
+      where: {
+        products: {
+          some: {
+            environments: {
+              some: {
+                id: environmentId,
               },
             },
-            select,
-            take: page ? ITEMS_PER_PAGE : undefined,
-            skip: page ? ITEMS_PER_PAGE * (page - 1) : undefined,
-          });
-          if (!organizations) {
-            throw new ResourceNotFoundError("Organizations by UserId", userId);
-          }
-          return organizations;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-
-          throw error;
-        }
+          },
+        },
       },
-      [`getOrganizationsByUserId-${userId}-${page}`],
-      {
-        tags: [organizationCache.tag.byUserId(userId)],
-      }
-    )()
-);
+      select: { ...select, memberships: true }, // include memberships
+    });
 
-export const getOrganizationByEnvironmentId = reactCache(
-  (environmentId: string): Promise<TOrganization | null> =>
-    cache(
-      async () => {
-        validateInputs([environmentId, ZId]);
+    return organization;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      console.error(error);
+      throw new DatabaseError(error.message);
+    }
 
-        try {
-          const organization = await prisma.organization.findFirst({
-            where: {
-              products: {
-                some: {
-                  environments: {
-                    some: {
-                      id: environmentId,
-                    },
-                  },
-                },
-              },
-            },
-            select: { ...select, memberships: true }, // include memberships
-          });
+    throw error;
+  }
+};
 
-          return organization;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            console.error(error);
-            throw new DatabaseError(error.message);
-          }
+export const getOrganization = async (organizationId: string): Promise<TOrganization | null> => {
+  validateInputs([organizationId, ZString]);
 
-          throw error;
-        }
+  try {
+    const organization = await prisma.organization.findUnique({
+      where: {
+        id: organizationId,
       },
-      [`getOrganizationByEnvironmentId-${environmentId}`],
-      {
-        tags: [organizationCache.tag.byEnvironmentId(environmentId)],
-      }
-    )()
-);
+      select,
+    });
+    return organization;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
 
-export const getOrganization = reactCache(
-  (organizationId: string): Promise<TOrganization | null> =>
-    cache(
-      async () => {
-        validateInputs([organizationId, ZString]);
-
-        try {
-          const organization = await prisma.organization.findUnique({
-            where: {
-              id: organizationId,
-            },
-            select,
-          });
-          return organization;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-
-          throw error;
-        }
-      },
-      [`getOrganization-${organizationId}`],
-      {
-        tags: [organizationCache.tag.byId(organizationId)],
-      }
-    )()
-);
+    throw error;
+  }
+};
 
 export const createOrganization = async (
   organizationInput: TOrganizationCreateInput
@@ -279,86 +252,68 @@ export const deleteOrganization = async (organizationId: string): Promise<TOrgan
   }
 };
 
-export const getMonthlyActiveOrganizationPeopleCount = reactCache(
-  (organizationId: string): Promise<number> =>
-    cache(
-      async () => {
-        validateInputs([organizationId, ZId]);
+export const getMonthlyActiveOrganizationPeopleCount = async (organizationId: string): Promise<number> => {
+  validateInputs([organizationId, ZId]);
 
-        try {
-          // temporary solution until we have a better way to track active users
-          return 0;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
+  try {
+    // temporary solution until we have a better way to track active users
+    return 0;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
 
-          throw error;
-        }
-      },
-      [`getMonthlyActiveOrganizationPeopleCount-${organizationId}`],
-      {
-        revalidate: 60 * 60 * 2, // 2 hours
+    throw error;
+  }
+};
+
+export const getMonthlyOrganizationResponseCount = async (organizationId: string): Promise<number> => {
+  validateInputs([organizationId, ZId]);
+
+  try {
+    const organization = await getOrganization(organizationId);
+    if (!organization) {
+      throw new ResourceNotFoundError("Organization", organizationId);
+    }
+
+    // Determine the start date based on the plan type
+    let startDate: Date;
+    if (organization.billing.plan === "free") {
+      // For free plans, use the first day of the current calendar month
+      const now = new Date();
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    } else {
+      // For other plans, use the periodStart from billing
+      if (!organization.billing.periodStart) {
+        throw new Error("Organization billing period start is not set");
       }
-    )()
-);
+      startDate = organization.billing.periodStart;
+    }
 
-export const getMonthlyOrganizationResponseCount = reactCache(
-  (organizationId: string): Promise<number> =>
-    cache(
-      async () => {
-        validateInputs([organizationId, ZId]);
+    // Get all environment IDs for the organization
+    const products = await getProducts(organizationId);
+    const environmentIds = products.flatMap((product) => product.environments.map((env) => env.id));
 
-        try {
-          const organization = await getOrganization(organizationId);
-          if (!organization) {
-            throw new ResourceNotFoundError("Organization", organizationId);
-          }
-
-          // Determine the start date based on the plan type
-          let startDate: Date;
-          if (organization.billing.plan === "free") {
-            // For free plans, use the first day of the current calendar month
-            const now = new Date();
-            startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-          } else {
-            // For other plans, use the periodStart from billing
-            if (!organization.billing.periodStart) {
-              throw new Error("Organization billing period start is not set");
-            }
-            startDate = organization.billing.periodStart;
-          }
-
-          // Get all environment IDs for the organization
-          const products = await getProducts(organizationId);
-          const environmentIds = products.flatMap((product) => product.environments.map((env) => env.id));
-
-          // Use Prisma's aggregate to count responses for all environments
-          const responseAggregations = await prisma.response.aggregate({
-            _count: {
-              id: true,
-            },
-            where: {
-              AND: [{ survey: { environmentId: { in: environmentIds } } }, { createdAt: { gte: startDate } }],
-            },
-          });
-
-          // The result is an aggregation of the total count
-          return responseAggregations._count.id;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-
-          throw error;
-        }
+    // Use Prisma's aggregate to count responses for all environments
+    const responseAggregations = await prisma.response.aggregate({
+      _count: {
+        id: true,
       },
-      [`getMonthlyOrganizationResponseCount-${organizationId}`],
-      {
-        revalidate: 60 * 60 * 2, // 2 hours
-      }
-    )()
-);
+      where: {
+        AND: [{ survey: { environmentId: { in: environmentIds } } }, { createdAt: { gte: startDate } }],
+      },
+    });
+
+    // The result is an aggregation of the total count
+    return responseAggregations._count.id;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+
+    throw error;
+  }
+};
 
 export const subscribeOrganizationMembersToSurveyResponses = async (
   surveyId: string,

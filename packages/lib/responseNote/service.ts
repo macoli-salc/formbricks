@@ -1,12 +1,10 @@
 import "server-only";
 import { Prisma } from "@prisma/client";
-import { cache as reactCache } from "react";
 import { prisma } from "@formbricks/database";
 import { ZString } from "@formbricks/types/common";
 import { ZId } from "@formbricks/types/common";
 import { DatabaseError, ResourceNotFoundError } from "@formbricks/types/errors";
 import { TResponseNote } from "@formbricks/types/responses";
-import { cache } from "../cache";
 import { responseCache } from "../response/cache";
 import { validateInputs } from "../utils/validate";
 import { responseNoteCache } from "./cache";
@@ -69,69 +67,53 @@ export const createResponseNote = async (
   }
 };
 
-export const getResponseNote = reactCache(
-  (responseNoteId: string): Promise<(TResponseNote & { responseId: string }) | null> =>
-    cache(
-      async () => {
-        try {
-          const responseNote = await prisma.responseNote.findUnique({
-            where: {
-              id: responseNoteId,
-            },
-            select: {
-              ...responseNoteSelect,
-              responseId: true,
-            },
-          });
-          return responseNote;
-        } catch (error) {
-          console.error(error);
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-
-          throw error;
-        }
+export const getResponseNote = async (
+  responseNoteId: string
+): Promise<(TResponseNote & { responseId: string }) | null> => {
+  try {
+    const responseNote = await prisma.responseNote.findUnique({
+      where: {
+        id: responseNoteId,
       },
-      [`getResponseNote-${responseNoteId}`],
-      {
-        tags: [responseNoteCache.tag.byId(responseNoteId)],
-      }
-    )()
-);
-
-export const getResponseNotes = reactCache(
-  (responseId: string): Promise<TResponseNote[]> =>
-    cache(
-      async () => {
-        try {
-          validateInputs([responseId, ZId]);
-
-          const responseNotes = await prisma.responseNote.findMany({
-            where: {
-              responseId,
-            },
-            select: responseNoteSelect,
-          });
-          if (!responseNotes) {
-            throw new ResourceNotFoundError("Response Notes by ResponseId", responseId);
-          }
-          return responseNotes;
-        } catch (error) {
-          console.error(error);
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-
-          throw error;
-        }
+      select: {
+        ...responseNoteSelect,
+        responseId: true,
       },
-      [`getResponseNotes-${responseId}`],
-      {
-        tags: [responseNoteCache.tag.byResponseId(responseId)],
-      }
-    )()
-);
+    });
+    return responseNote;
+  } catch (error) {
+    console.error(error);
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+
+    throw error;
+  }
+};
+
+export const getResponseNotes = async (responseId: string): Promise<TResponseNote[]> => {
+  try {
+    validateInputs([responseId, ZId]);
+
+    const responseNotes = await prisma.responseNote.findMany({
+      where: {
+        responseId,
+      },
+      select: responseNoteSelect,
+    });
+    if (!responseNotes) {
+      throw new ResourceNotFoundError("Response Notes by ResponseId", responseId);
+    }
+    return responseNotes;
+  } catch (error) {
+    console.error(error);
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+
+    throw error;
+  }
+};
 
 export const updateResponseNote = async (responseNoteId: string, text: string): Promise<TResponseNote> => {
   validateInputs([responseNoteId, ZString], [text, ZString]);

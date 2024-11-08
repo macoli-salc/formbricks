@@ -1,5 +1,4 @@
 import { Prisma } from "@prisma/client";
-import { cache as reactCache } from "react";
 import { prisma } from "@formbricks/database";
 import { ZId } from "@formbricks/types/common";
 import { DatabaseError, ResourceNotFoundError, ValidationError } from "@formbricks/types/errors";
@@ -85,7 +84,7 @@ export const createLanguage = async (
   }
 };
 
-export const getSurveysUsingGivenLanguage = reactCache(async (languageId: string): Promise<string[]> => {
+export const getSurveysUsingGivenLanguage = async (languageId: string): Promise<string[]> => {
   try {
     // Check if the language is used in any survey
     const surveys = await prisma.surveyLanguage.findMany({
@@ -111,7 +110,7 @@ export const getSurveysUsingGivenLanguage = reactCache(async (languageId: string
     }
     throw error;
   }
-});
+};
 
 export const deleteLanguage = async (languageId: string, productId: string): Promise<TLanguage> => {
   try {

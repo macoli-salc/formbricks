@@ -1,14 +1,9 @@
 import "server-only";
 import { getInsightsBySurveyIdQuestionId } from "@/app/(app)/environments/[environmentId]/surveys/[surveyId]/(analysis)/summary/lib/insights";
 import { Prisma } from "@prisma/client";
-import { cache as reactCache } from "react";
-import { cache } from "@formbricks/lib/cache";
-import { displayCache } from "@formbricks/lib/display/cache";
 import { getDisplayCountBySurveyId } from "@formbricks/lib/display/service";
 import { getLocalizedValue } from "@formbricks/lib/i18n/utils";
-import { responseCache } from "@formbricks/lib/response/cache";
 import { getResponseCountBySurveyId, getResponses } from "@formbricks/lib/response/service";
-import { surveyCache } from "@formbricks/lib/survey/cache";
 import { getSurvey } from "@formbricks/lib/survey/service";
 import { evaluateLogic, performActions } from "@formbricks/lib/surveyLogic/utils";
 import { validateInputs } from "@formbricks/lib/utils/validate";
@@ -882,60 +877,49 @@ export const getQuestionSummary = async (
   return summary;
 };
 
-export const getSurveySummary = reactCache(
-  (surveyId: string, filterCriteria?: TResponseFilterCriteria): Promise<TSurveySummary> =>
-    cache(
-      async () => {
-        validateInputs([surveyId, ZId], [filterCriteria, ZResponseFilterCriteria.optional()]);
+export const getSurveySummary = async (
+  surveyId: string,
+  filterCriteria?: TResponseFilterCriteria
+): Promise<TSurveySummary> => {
+  validateInputs([surveyId, ZId], [filterCriteria, ZResponseFilterCriteria.optional()]);
 
-        try {
-          const survey = await getSurvey(surveyId);
-          if (!survey) {
-            throw new ResourceNotFoundError("Survey", surveyId);
-          }
+  try {
+    const survey = await getSurvey(surveyId);
+    if (!survey) {
+      throw new ResourceNotFoundError("Survey", surveyId);
+    }
 
-          const batchSize = 3000;
-          const totalResponseCount = await getResponseCountBySurveyId(surveyId);
-          const filteredResponseCount = await getResponseCountBySurveyId(surveyId, filterCriteria);
+    const batchSize = 3000;
+    const totalResponseCount = await getResponseCountBySurveyId(surveyId);
+    const filteredResponseCount = await getResponseCountBySurveyId(surveyId, filterCriteria);
 
-          const hasFilter = totalResponseCount !== filteredResponseCount;
+    const hasFilter = totalResponseCount !== filteredResponseCount;
 
-          const pages = Math.ceil(filteredResponseCount / batchSize);
+    const pages = Math.ceil(filteredResponseCount / batchSize);
 
-          const responsesArray = await Promise.all(
-            Array.from({ length: pages }, (_, i) => {
-              return getResponses(surveyId, batchSize, i * batchSize, filterCriteria);
-            })
-          );
-          const responses = responsesArray.flat();
+    const responsesArray = await Promise.all(
+      Array.from({ length: pages }, (_, i) => {
+        return getResponses(surveyId, batchSize, i * batchSize, filterCriteria);
+      })
+    );
+    const responses = responsesArray.flat();
 
-          const responseIds = hasFilter ? responses.map((response) => response.id) : [];
+    const responseIds = hasFilter ? responses.map((response) => response.id) : [];
 
-          const displayCount = await getDisplayCountBySurveyId(surveyId, {
-            createdAt: filterCriteria?.createdAt,
-            ...(hasFilter && { responseIds }),
-          });
+    const displayCount = await getDisplayCountBySurveyId(surveyId, {
+      createdAt: filterCriteria?.createdAt,
+      ...(hasFilter && { responseIds }),
+    });
 
-          const dropOff = getSurveySummaryDropOff(survey, responses, displayCount);
-          const meta = getSurveySummaryMeta(responses, displayCount);
-          const questionWiseSummary = await getQuestionSummary(survey, responses, dropOff);
+    const dropOff = getSurveySummaryDropOff(survey, responses, displayCount);
+    const meta = getSurveySummaryMeta(responses, displayCount);
+    const questionWiseSummary = await getQuestionSummary(survey, responses, dropOff);
 
-          return { meta, dropOff, summary: questionWiseSummary };
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-
-          throw error;
-        }
-      },
-      [`getSurveySummary-${surveyId}-${JSON.stringify(filterCriteria)}`],
-      {
-        tags: [
-          surveyCache.tag.byId(surveyId),
-          responseCache.tag.bySurveyId(surveyId),
-          displayCache.tag.bySurveyId(surveyId),
-        ],
-      }
-    )()
-);
+    return { meta, dropOff, summary: questionWiseSummary };
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+    throw error;
+  }
+};

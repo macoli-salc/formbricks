@@ -1,6 +1,5 @@
 import "server-only";
 import { Prisma } from "@prisma/client";
-import { cache as reactCache } from "react";
 import { prisma } from "@formbricks/database";
 import { TAttributes } from "@formbricks/types/attributes";
 import { ZId, ZOptionalNumber, ZString } from "@formbricks/types/common";
@@ -18,7 +17,6 @@ import {
 import { TSurvey, TSurveyQuestionTypeEnum } from "@formbricks/types/surveys/types";
 import { TTag } from "@formbricks/types/tags";
 import { getAttributes } from "../attribute/service";
-import { cache } from "../cache";
 import { IS_FORMBRICKS_CLOUD, ITEMS_PER_PAGE, WEBAPP_URL } from "../constants";
 import { deleteDisplay } from "../display/service";
 import { getMonthlyOrganizationResponseCount, getOrganizationByEnvironmentId } from "../organization/service";
@@ -96,151 +94,134 @@ export const responseSelection = {
   },
 } satisfies Prisma.ResponseSelect;
 
-export const getResponsesByPersonId = reactCache(
-  (personId: string, page?: number): Promise<TResponse[] | null> =>
-    cache(
-      async () => {
-        validateInputs([personId, ZId], [page, ZOptionalNumber]);
+export const getResponsesByPersonId = async (
+  personId: string,
+  page?: number
+): Promise<TResponse[] | null> => {
+  validateInputs([personId, ZId], [page, ZOptionalNumber]);
 
-        try {
-          const responsePrisma = await prisma.response.findMany({
-            where: {
-              personId,
-            },
-            select: responseSelection,
-            take: page ? ITEMS_PER_PAGE : undefined,
-            skip: page ? ITEMS_PER_PAGE * (page - 1) : undefined,
-            orderBy: {
-              createdAt: "desc",
-            },
-          });
-
-          if (!responsePrisma) {
-            throw new ResourceNotFoundError("Response from PersonId", personId);
-          }
-
-          let responses: TResponse[] = [];
-
-          await Promise.all(
-            responsePrisma.map(async (response) => {
-              const responseNotes = await getResponseNotes(response.id);
-              responses.push({
-                ...response,
-                notes: responseNotes,
-                tags: response.tags.map((tagPrisma: { tag: TTag }) => tagPrisma.tag),
-              });
-            })
-          );
-
-          return responses;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-
-          throw error;
-        }
+  try {
+    const responsePrisma = await prisma.response.findMany({
+      where: {
+        personId,
       },
-      [`getResponsesByPersonId-${personId}-${page}`],
-      {
-        tags: [responseCache.tag.byPersonId(personId)],
-      }
-    )()
-);
-
-export const getResponsesByUserId = reactCache(
-  (environmentId: string, userId: string, page?: number): Promise<TResponse[] | null> =>
-    cache(
-      async () => {
-        validateInputs([environmentId, ZId], [userId, ZString], [page, ZOptionalNumber]);
-
-        const person = await getPersonByUserId(environmentId, userId);
-
-        if (!person) {
-          throw new ResourceNotFoundError("Person", userId);
-        }
-
-        try {
-          const responsePrisma = await prisma.response.findMany({
-            where: {
-              personId: person.id,
-            },
-            select: responseSelection,
-            take: page ? ITEMS_PER_PAGE : undefined,
-            skip: page ? ITEMS_PER_PAGE * (page - 1) : undefined,
-            orderBy: {
-              createdAt: "desc",
-            },
-          });
-
-          if (!responsePrisma) {
-            throw new ResourceNotFoundError("Response from PersonId", person.id);
-          }
-
-          const responsePromises = responsePrisma.map(async (response) => {
-            const tags = response.tags.map((tagPrisma: { tag: TTag }) => tagPrisma.tag);
-
-            return {
-              ...response,
-              tags,
-            };
-          });
-
-          const responses = await Promise.all(responsePromises);
-          return responses;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-
-          throw error;
-        }
+      select: responseSelection,
+      take: page ? ITEMS_PER_PAGE : undefined,
+      skip: page ? ITEMS_PER_PAGE * (page - 1) : undefined,
+      orderBy: {
+        createdAt: "desc",
       },
-      [`getResponsesByUserId-${environmentId}-${userId}-${page}`],
-      {
-        tags: [responseCache.tag.byEnvironmentIdAndUserId(environmentId, userId)],
-      }
-    )()
-);
+    });
 
-export const getResponseBySingleUseId = reactCache(
-  (surveyId: string, singleUseId: string): Promise<TResponse | null> =>
-    cache(
-      async () => {
-        validateInputs([surveyId, ZId], [singleUseId, ZString]);
+    if (!responsePrisma) {
+      throw new ResourceNotFoundError("Response from PersonId", personId);
+    }
 
-        try {
-          const responsePrisma = await prisma.response.findUnique({
-            where: {
-              surveyId_singleUseId: { surveyId, singleUseId },
-            },
-            select: responseSelection,
-          });
+    let responses: TResponse[] = [];
 
-          if (!responsePrisma) {
-            return null;
-          }
+    await Promise.all(
+      responsePrisma.map(async (response) => {
+        const responseNotes = await getResponseNotes(response.id);
+        responses.push({
+          ...response,
+          notes: responseNotes,
+          tags: response.tags.map((tagPrisma: { tag: TTag }) => tagPrisma.tag),
+        });
+      })
+    );
 
-          const response: TResponse = {
-            ...responsePrisma,
-            tags: responsePrisma.tags.map((tagPrisma: { tag: TTag }) => tagPrisma.tag),
-          };
+    return responses;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
 
-          return response;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
+    throw error;
+  }
+};
 
-          throw error;
-        }
+export const getResponsesByUserId = async (
+  environmentId: string,
+  userId: string,
+  page?: number
+): Promise<TResponse[] | null> => {
+  validateInputs([environmentId, ZId], [userId, ZString], [page, ZOptionalNumber]);
+
+  const person = await getPersonByUserId(environmentId, userId);
+
+  if (!person) {
+    throw new ResourceNotFoundError("Person", userId);
+  }
+
+  try {
+    const responsePrisma = await prisma.response.findMany({
+      where: {
+        personId: person.id,
       },
-      [`getResponseBySingleUseId-${surveyId}-${singleUseId}`],
-      {
-        tags: [responseCache.tag.bySingleUseId(surveyId, singleUseId)],
-      }
-    )()
-);
+      select: responseSelection,
+      take: page ? ITEMS_PER_PAGE : undefined,
+      skip: page ? ITEMS_PER_PAGE * (page - 1) : undefined,
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    if (!responsePrisma) {
+      throw new ResourceNotFoundError("Response from PersonId", person.id);
+    }
+
+    const responsePromises = responsePrisma.map(async (response) => {
+      const tags = response.tags.map((tagPrisma: { tag: TTag }) => tagPrisma.tag);
+
+      return {
+        ...response,
+        tags,
+      };
+    });
+
+    const responses = await Promise.all(responsePromises);
+    return responses;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+
+    throw error;
+  }
+};
+
+export const getResponseBySingleUseId = async (
+  surveyId: string,
+  singleUseId: string
+): Promise<TResponse | null> => {
+  validateInputs([surveyId, ZId], [singleUseId, ZString]);
+
+  try {
+    const responsePrisma = await prisma.response.findUnique({
+      where: {
+        surveyId_singleUseId: { surveyId, singleUseId },
+      },
+      select: responseSelection,
+    });
+
+    if (!responsePrisma) {
+      return null;
+    }
+
+    const response: TResponse = {
+      ...responsePrisma,
+      tags: responsePrisma.tags.map((tagPrisma: { tag: TTag }) => tagPrisma.tag),
+    };
+
+    return response;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+
+    throw error;
+  }
+};
 
 export const createResponse = async (responseInput: TResponseInput): Promise<TResponse> => {
   validateInputs([responseInput, ZResponseInput]);
@@ -366,146 +347,120 @@ export const createResponse = async (responseInput: TResponseInput): Promise<TRe
   }
 };
 
-export const getResponse = reactCache(
-  (responseId: string): Promise<TResponse | null> =>
-    cache(
-      async () => {
-        validateInputs([responseId, ZId]);
+export const getResponse = async (responseId: string): Promise<TResponse | null> => {
+  validateInputs([responseId, ZId]);
 
-        try {
-          const responsePrisma = await prisma.response.findUnique({
-            where: {
-              id: responseId,
-            },
-            select: responseSelection,
-          });
-
-          if (!responsePrisma) {
-            return null;
-          }
-
-          const response: TResponse = {
-            ...responsePrisma,
-            tags: responsePrisma.tags.map((tagPrisma: { tag: TTag }) => tagPrisma.tag),
-          };
-
-          return response;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-
-          throw error;
-        }
+  try {
+    const responsePrisma = await prisma.response.findUnique({
+      where: {
+        id: responseId,
       },
-      [`getResponse-${responseId}`],
-      {
-        tags: [responseCache.tag.byId(responseId), responseNoteCache.tag.byResponseId(responseId)],
-      }
-    )()
-);
+      select: responseSelection,
+    });
 
-export const getResponseFilteringValues = reactCache((surveyId: string) =>
-  cache(
-    async () => {
-      validateInputs([surveyId, ZId]);
-
-      try {
-        const survey = await getSurvey(surveyId);
-        if (!survey) {
-          throw new ResourceNotFoundError("Survey", surveyId);
-        }
-
-        const responses = await prisma.response.findMany({
-          where: {
-            surveyId,
-          },
-          select: {
-            data: true,
-            meta: true,
-            personAttributes: true,
-          },
-        });
-
-        const personAttributes = getResponsePersonAttributes(responses);
-        const meta = getResponseMeta(responses);
-        const hiddenFields = getResponseHiddenFields(survey, responses);
-
-        return { personAttributes, meta, hiddenFields };
-      } catch (error) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-          throw new DatabaseError(error.message);
-        }
-
-        throw error;
-      }
-    },
-    [`getResponseFilteringValues-${surveyId}`],
-    {
-      tags: [responseCache.tag.bySurveyId(surveyId)],
+    if (!responsePrisma) {
+      return null;
     }
-  )()
-);
 
-export const getResponses = reactCache(
-  (
-    surveyId: string,
-    limit?: number,
-    offset?: number,
-    filterCriteria?: TResponseFilterCriteria
-  ): Promise<TResponse[]> =>
-    cache(
-      async () => {
-        validateInputs(
-          [surveyId, ZId],
-          [limit, ZOptionalNumber],
-          [offset, ZOptionalNumber],
-          [filterCriteria, ZResponseFilterCriteria.optional()]
-        );
+    const response: TResponse = {
+      ...responsePrisma,
+      tags: responsePrisma.tags.map((tagPrisma: { tag: TTag }) => tagPrisma.tag),
+    };
 
-        limit = limit ?? RESPONSES_PER_PAGE;
-        const survey = await getSurvey(surveyId);
-        if (!survey) return [];
-        try {
-          const responses = await prisma.response.findMany({
-            where: {
-              surveyId,
-              ...buildWhereClause(survey, filterCriteria),
-            },
-            select: responseSelection,
-            orderBy: [
-              {
-                createdAt: "desc",
-              },
-            ],
-            take: limit ? limit : undefined,
-            skip: offset ? offset : undefined,
-          });
+    return response;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
 
-          const transformedResponses: TResponse[] = await Promise.all(
-            responses.map((responsePrisma) => {
-              return {
-                ...responsePrisma,
-                tags: responsePrisma.tags.map((tagPrisma: { tag: TTag }) => tagPrisma.tag),
-              };
-            })
-          );
+    throw error;
+  }
+};
 
-          return transformedResponses;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
+export const getResponseFilteringValues = async (surveyId: string) => {
+  validateInputs([surveyId, ZId]);
 
-          throw error;
-        }
+  try {
+    const survey = await getSurvey(surveyId);
+    if (!survey) {
+      throw new ResourceNotFoundError("Survey", surveyId);
+    }
+
+    const responses = await prisma.response.findMany({
+      where: {
+        surveyId,
       },
-      [`getResponses-${surveyId}-${limit}-${offset}-${JSON.stringify(filterCriteria)}`],
-      {
-        tags: [responseCache.tag.bySurveyId(surveyId)],
-      }
-    )()
-);
+      select: {
+        data: true,
+        meta: true,
+        personAttributes: true,
+      },
+    });
+
+    const personAttributes = getResponsePersonAttributes(responses);
+    const meta = getResponseMeta(responses);
+    const hiddenFields = getResponseHiddenFields(survey, responses);
+
+    return { personAttributes, meta, hiddenFields };
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+
+    throw error;
+  }
+};
+
+export const getResponses = async (
+  surveyId: string,
+  limit?: number,
+  offset?: number,
+  filterCriteria?: TResponseFilterCriteria
+): Promise<TResponse[]> => {
+  validateInputs(
+    [surveyId, ZId],
+    [limit, ZOptionalNumber],
+    [offset, ZOptionalNumber],
+    [filterCriteria, ZResponseFilterCriteria.optional()]
+  );
+
+  limit = limit ?? RESPONSES_PER_PAGE;
+  const survey = await getSurvey(surveyId);
+  if (!survey) return [];
+  try {
+    const responses = await prisma.response.findMany({
+      where: {
+        surveyId,
+        ...buildWhereClause(survey, filterCriteria),
+      },
+      select: responseSelection,
+      orderBy: [
+        {
+          createdAt: "desc",
+        },
+      ],
+      take: limit ? limit : undefined,
+      skip: offset ? offset : undefined,
+    });
+
+    const transformedResponses: TResponse[] = await Promise.all(
+      responses.map((responsePrisma) => {
+        return {
+          ...responsePrisma,
+          tags: responsePrisma.tags.map((tagPrisma: { tag: TTag }) => tagPrisma.tag),
+        };
+      })
+    );
+
+    return transformedResponses;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+
+    throw error;
+  }
+};
 
 export const getResponseDownloadUrl = async (
   surveyId: string,
@@ -583,53 +538,48 @@ export const getResponseDownloadUrl = async (
   }
 };
 
-export const getResponsesByEnvironmentId = reactCache(
-  (environmentId: string, limit?: number, offset?: number): Promise<TResponse[]> =>
-    cache(
-      async () => {
-        validateInputs([environmentId, ZId], [limit, ZOptionalNumber], [offset, ZOptionalNumber]);
+export const getResponsesByEnvironmentId = async (
+  environmentId: string,
+  limit?: number,
+  offset?: number
+): Promise<TResponse[]> => {
+  validateInputs([environmentId, ZId], [limit, ZOptionalNumber], [offset, ZOptionalNumber]);
 
-        try {
-          const responses = await prisma.response.findMany({
-            where: {
-              survey: {
-                environmentId,
-              },
-            },
-            select: responseSelection,
-            orderBy: [
-              {
-                createdAt: "desc",
-              },
-            ],
-            take: limit ? limit : undefined,
-            skip: offset ? offset : undefined,
-          });
-
-          const transformedResponses: TResponse[] = await Promise.all(
-            responses.map(async (responsePrisma) => {
-              return {
-                ...responsePrisma,
-                tags: responsePrisma.tags.map((tagPrisma: { tag: TTag }) => tagPrisma.tag),
-              };
-            })
-          );
-
-          return transformedResponses;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-
-          throw error;
-        }
+  try {
+    const responses = await prisma.response.findMany({
+      where: {
+        survey: {
+          environmentId,
+        },
       },
-      [`getResponsesByEnvironmentId-${environmentId}-${limit}-${offset}`],
-      {
-        tags: [responseCache.tag.byEnvironmentId(environmentId)],
-      }
-    )()
-);
+      select: responseSelection,
+      orderBy: [
+        {
+          createdAt: "desc",
+        },
+      ],
+      take: limit ? limit : undefined,
+      skip: offset ? offset : undefined,
+    });
+
+    const transformedResponses: TResponse[] = await Promise.all(
+      responses.map(async (responsePrisma) => {
+        return {
+          ...responsePrisma,
+          tags: responsePrisma.tags.map((tagPrisma: { tag: TTag }) => tagPrisma.tag),
+        };
+      })
+    );
+
+    return transformedResponses;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+
+    throw error;
+  }
+};
 
 export const updateResponse = async (
   responseId: string,
@@ -788,68 +738,56 @@ export const deleteResponse = async (responseId: string): Promise<TResponse> => 
   }
 };
 
-export const getResponseCountBySurveyId = reactCache(
-  (surveyId: string, filterCriteria?: TResponseFilterCriteria): Promise<number> =>
-    cache(
-      async () => {
-        validateInputs([surveyId, ZId], [filterCriteria, ZResponseFilterCriteria.optional()]);
+export const getResponseCountBySurveyId = async (
+  surveyId: string,
+  filterCriteria?: TResponseFilterCriteria
+): Promise<number> => {
+  validateInputs([surveyId, ZId], [filterCriteria, ZResponseFilterCriteria.optional()]);
 
-        try {
-          const survey = await getSurvey(surveyId);
-          if (!survey) return 0;
+  try {
+    const survey = await getSurvey(surveyId);
+    if (!survey) return 0;
 
-          const responseCount = await prisma.response.count({
-            where: {
-              surveyId: surveyId,
-              ...buildWhereClause(survey, filterCriteria),
-            },
-          });
-          return responseCount;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-
-          throw error;
-        }
+    const responseCount = await prisma.response.count({
+      where: {
+        surveyId: surveyId,
+        ...buildWhereClause(survey, filterCriteria),
       },
-      [`getResponseCountBySurveyId-${surveyId}-${JSON.stringify(filterCriteria)}`],
-      {
-        tags: [responseCache.tag.bySurveyId(surveyId)],
-      }
-    )()
-);
+    });
+    return responseCount;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
 
-export const getIfResponseWithSurveyIdAndEmailExist = reactCache(
-  (surveyId: string, email: string): Promise<boolean> =>
-    cache(
-      async () => {
-        validateInputs([surveyId, ZId], [email, ZString]);
+    throw error;
+  }
+};
 
-        try {
-          const response = await prisma.response.findFirst({
-            where: {
-              surveyId,
-              data: {
-                path: ["verifiedEmail"],
-                equals: email,
-              },
-            },
-            select: { id: true },
-          });
+export const getIfResponseWithSurveyIdAndEmailExist = async (
+  surveyId: string,
+  email: string
+): Promise<boolean> => {
+  validateInputs([surveyId, ZId], [email, ZString]);
 
-          return !!response;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-
-          throw error;
-        }
+  try {
+    const response = await prisma.response.findFirst({
+      where: {
+        surveyId,
+        data: {
+          path: ["verifiedEmail"],
+          equals: email,
+        },
       },
-      [`getIfResponseWithSurveyIdAndEmailExist-${surveyId}-${email}`],
-      {
-        tags: [responseCache.tag.bySurveyId(surveyId)],
-      }
-    )()
-);
+      select: { id: true },
+    });
+
+    return !!response;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+
+    throw error;
+  }
+};

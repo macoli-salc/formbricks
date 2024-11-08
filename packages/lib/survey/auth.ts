@@ -1,37 +1,28 @@
 import { ZId } from "@formbricks/types/common";
-import { cache } from "../cache";
 import { hasUserEnvironmentAccess } from "../environment/auth";
 import { getMembershipByUserIdOrganizationId } from "../membership/service";
 import { getAccessFlags } from "../membership/utils";
 import { getOrganizationByEnvironmentId } from "../organization/service";
 import { validateInputs } from "../utils/validate";
-import { surveyCache } from "./cache";
 import { getSurvey } from "./service";
 
-export const canUserAccessSurvey = (userId: string, surveyId: string): Promise<boolean> =>
-  cache(
-    async () => {
-      validateInputs([surveyId, ZId], [userId, ZId]);
+export const canUserAccessSurvey = async (userId: string, surveyId: string): Promise<boolean> => {
+  validateInputs([surveyId, ZId], [userId, ZId]);
 
-      if (!userId) return false;
+  if (!userId) return false;
 
-      try {
-        const survey = await getSurvey(surveyId);
-        if (!survey) throw new Error("Survey not found");
+  try {
+    const survey = await getSurvey(surveyId);
+    if (!survey) throw new Error("Survey not found");
 
-        const hasAccessToEnvironment = await hasUserEnvironmentAccess(userId, survey.environmentId);
-        if (!hasAccessToEnvironment) return false;
+    const hasAccessToEnvironment = await hasUserEnvironmentAccess(userId, survey.environmentId);
+    if (!hasAccessToEnvironment) return false;
 
-        return true;
-      } catch (error) {
-        throw error;
-      }
-    },
-    [`canUserAccessSurvey-${userId}-${surveyId}`],
-    {
-      tags: [surveyCache.tag.byId(surveyId)],
-    }
-  )();
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
 
 export const verifyUserRoleAccess = async (
   environmentId: string,

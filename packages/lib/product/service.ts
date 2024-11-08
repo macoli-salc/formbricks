@@ -1,6 +1,5 @@
 import "server-only";
 import { Prisma } from "@prisma/client";
-import { cache as reactCache } from "react";
 import { z } from "zod";
 import { prisma } from "@formbricks/database";
 import { ZOptionalNumber, ZString } from "@formbricks/types/common";
@@ -8,7 +7,6 @@ import { ZId } from "@formbricks/types/common";
 import { DatabaseError, ValidationError } from "@formbricks/types/errors";
 import type { TProduct, TProductUpdateInput } from "@formbricks/types/product";
 import { ZProduct, ZProductUpdateInput } from "@formbricks/types/product";
-import { cache } from "../cache";
 import { ITEMS_PER_PAGE, isS3Configured } from "../constants";
 import { environmentCache } from "../environment/cache";
 import { createEnvironment } from "../environment/service";
@@ -35,72 +33,54 @@ const selectProduct = {
   logo: true,
 };
 
-export const getProducts = reactCache(
-  (organizationId: string, page?: number): Promise<TProduct[]> =>
-    cache(
-      async () => {
-        validateInputs([organizationId, ZId], [page, ZOptionalNumber]);
+export const getProducts = async (organizationId: string, page?: number): Promise<TProduct[]> => {
+  validateInputs([organizationId, ZId], [page, ZOptionalNumber]);
 
-        try {
-          const products = await prisma.product.findMany({
-            where: {
-              organizationId,
-            },
-            select: selectProduct,
-            take: page ? ITEMS_PER_PAGE : undefined,
-            skip: page ? ITEMS_PER_PAGE * (page - 1) : undefined,
-          });
-          return products;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-
-          throw error;
-        }
+  try {
+    const products = await prisma.product.findMany({
+      where: {
+        organizationId,
       },
-      [`getProducts-${organizationId}-${page}`],
-      {
-        tags: [productCache.tag.byOrganizationId(organizationId)],
-      }
-    )()
-);
+      select: selectProduct,
+      take: page ? ITEMS_PER_PAGE : undefined,
+      skip: page ? ITEMS_PER_PAGE * (page - 1) : undefined,
+    });
+    return products;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
 
-export const getProductByEnvironmentId = reactCache(
-  (environmentId: string): Promise<TProduct | null> =>
-    cache(
-      async () => {
-        validateInputs([environmentId, ZId]);
+    throw error;
+  }
+};
 
-        let productPrisma;
+export const getProductByEnvironmentId = async (environmentId: string): Promise<TProduct | null> => {
+  validateInputs([environmentId, ZId]);
 
-        try {
-          productPrisma = await prisma.product.findFirst({
-            where: {
-              environments: {
-                some: {
-                  id: environmentId,
-                },
-              },
-            },
-            select: selectProduct,
-          });
+  let productPrisma;
 
-          return productPrisma;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            console.error(error);
-            throw new DatabaseError(error.message);
-          }
-          throw error;
-        }
+  try {
+    productPrisma = await prisma.product.findFirst({
+      where: {
+        environments: {
+          some: {
+            id: environmentId,
+          },
+        },
       },
-      [`getProductByEnvironmentId-${environmentId}`],
-      {
-        tags: [productCache.tag.byEnvironmentId(environmentId)],
-      }
-    )()
-);
+      select: selectProduct,
+    });
+
+    return productPrisma;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      console.error(error);
+      throw new DatabaseError(error.message);
+    }
+    throw error;
+  }
+};
 
 export const updateProduct = async (
   productId: string,
@@ -153,33 +133,24 @@ export const updateProduct = async (
   }
 };
 
-export const getProduct = reactCache(
-  (productId: string): Promise<TProduct | null> =>
-    cache(
-      async () => {
-        let productPrisma;
-        try {
-          productPrisma = await prisma.product.findUnique({
-            where: {
-              id: productId,
-            },
-            select: selectProduct,
-          });
-
-          return productPrisma;
-        } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            throw new DatabaseError(error.message);
-          }
-          throw error;
-        }
+export const getProduct = async (productId: string): Promise<TProduct | null> => {
+  let productPrisma;
+  try {
+    productPrisma = await prisma.product.findUnique({
+      where: {
+        id: productId,
       },
-      [`getProduct-${productId}`],
-      {
-        tags: [productCache.tag.byId(productId)],
-      }
-    )()
-);
+      select: selectProduct,
+    });
+
+    return productPrisma;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      throw new DatabaseError(error.message);
+    }
+    throw error;
+  }
+};
 
 export const deleteProduct = async (productId: string): Promise<TProduct> => {
   try {
