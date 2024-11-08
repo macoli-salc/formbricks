@@ -39,7 +39,7 @@ export const DeleteAccountModal = ({
       // redirect to account deletion survey in Formbricks Cloud
       if (isFormbricksCloud) {
         await signOut({ redirect: true });
-        window.location.replace("https://app.formbricks.com/s/clri52y3z8f221225wjdhsoo2");
+        window.location.replace("https://app.escuta.ai/s/clri52y3z8f221225wjdhsoo2");
       } else {
         await signOut({ callbackUrl: "/auth/login" });
       }
