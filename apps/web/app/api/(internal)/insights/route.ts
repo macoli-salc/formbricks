@@ -7,7 +7,7 @@ import { z } from "zod";
 import { CRON_SECRET } from "@formbricks/lib/constants";
 import { generateInsightsEnabledForSurveyQuestions } from "./lib/utils";
 
-export const maxDuration = 60; // This function can run for a maximum of 300 seconds
+export const maxDuration = 300; // This function can run for a maximum of 300 seconds
 
 const ZGenerateInsightsInput = z.object({
   surveyId: z.string(),

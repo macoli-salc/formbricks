@@ -5,7 +5,7 @@
       "memory": 512
     },
     "app/api/cron/**/*.ts": {
-      "maxDuration": 59,
+      "maxDuration": 180,
       "memory": 512
     },
     "app/api/v1/client/**/*.ts": {
