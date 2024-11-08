@@ -20,7 +20,7 @@ import { PageHeader } from "@formbricks/ui/components/PageHeader";
 import { TemplateList } from "@formbricks/ui/components/TemplateList";
 
 export const metadata: Metadata = {
-  title: "Your Surveys",
+  title: "Pesquisas",
 };
 
 interface SurveyTemplateProps {
@@ -65,6 +65,8 @@ const Page = async ({ params, searchParams }: SurveyTemplateProps) => {
   }
 
   const surveyCount = await getSurveyCount(params.environmentId);
+
+  console.log({ surveyCount });
 
   const environments = await getEnvironments(product.id);
   const otherEnvironment = environments.find((e) => e.type !== environment.type)!;

@@ -10,7 +10,7 @@ import { getOrganizationByEnvironmentId } from "@formbricks/lib/organization/ser
 import { ErrorComponent } from "@formbricks/ui/components/ErrorComponent";
 
 export const metadata: Metadata = {
-  title: "Billing",
+  title: "Assinatura",
 };
 
 const BillingLayout = async ({ children, params }) => {

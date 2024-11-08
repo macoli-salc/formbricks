@@ -13,8 +13,8 @@ import { findMatchingLocale } from "@formbricks/lib/utils/locale";
 import { SignupOptions } from "@formbricks/ui/components/SignupOptions";
 
 export const metadata: Metadata = {
-  title: "Sign up",
-  description: "Open-source Experience Management. Free & open source.",
+  title: "Cadastro",
+  description: "Escuta AI - Ouça seus clientes para crescer rápido com IA",
 };
 
 const Page = async () => {

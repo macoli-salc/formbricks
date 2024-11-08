@@ -75,7 +75,7 @@ export const HowToSendCard = ({ localSurvey, setLocalSurvey, environment, locale
   const options = [
     {
       id: "link",
-      name: t("common.link_survey"),
+      name: "Pesquisa de Link",
       icon: LinkIcon,
       description: t("environments.surveys.edit.link_survey_description"),
       comingSoon: false,

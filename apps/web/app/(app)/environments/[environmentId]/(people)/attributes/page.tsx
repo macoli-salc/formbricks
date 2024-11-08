@@ -11,7 +11,7 @@ import { PageHeader } from "@formbricks/ui/components/PageHeader";
 import { AttributeClassesTable } from "./components/AttributeClassesTable";
 
 export const metadata: Metadata = {
-  title: "Attributes",
+  title: "Atributos",
 };
 
 const Page = async ({ params }) => {

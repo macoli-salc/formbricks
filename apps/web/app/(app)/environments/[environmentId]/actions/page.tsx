@@ -11,7 +11,7 @@ import { PageContentWrapper } from "@formbricks/ui/components/PageContentWrapper
 import { PageHeader } from "@formbricks/ui/components/PageHeader";
 
 export const metadata: Metadata = {
-  title: "Actions",
+  title: "Ações",
 };
 
 const Page = async ({ params }) => {

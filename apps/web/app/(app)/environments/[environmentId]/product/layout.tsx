@@ -6,7 +6,7 @@ import { getOrganizationByEnvironmentId } from "@formbricks/lib/organization/ser
 import { getProductByEnvironmentId } from "@formbricks/lib/product/service";
 
 export const metadata: Metadata = {
-  title: "Config",
+  title: "Configurações",
 };
 
 const ConfigLayout = async ({ children, params }) => {

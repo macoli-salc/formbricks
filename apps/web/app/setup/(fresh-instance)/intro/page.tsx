@@ -4,7 +4,7 @@ import { Button } from "@formbricks/ui/components/Button";
 
 export const metadata: Metadata = {
   title: "Intro",
-  description: "Open-source Experience Management. Free & open source.",
+  description: "Escuta AI - Ouça seus clientes para crescer rápido com IA",
 };
 
 const Page = async () => {

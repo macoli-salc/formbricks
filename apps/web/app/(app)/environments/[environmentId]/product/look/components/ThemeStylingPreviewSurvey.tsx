@@ -202,7 +202,7 @@ export const ThemeStylingPreviewSurvey = ({
         <div
           className={`${previewType === "link" ? "rounded-full bg-slate-200" : ""} cursor-pointer px-3 py-1 text-sm`}
           onClick={() => setPreviewType("link")}>
-          {t("common.link_survey")}
+          Pesquisa de Link
         </div>
 
         <div

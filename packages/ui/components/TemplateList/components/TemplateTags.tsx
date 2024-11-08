@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { SplitIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
@@ -86,7 +87,7 @@ export const TemplateTags = ({ template, selectedFilter }: TemplateTagsProps) =>
 
   const industryTag = useMemo(
     () => getIndustryTag(template.industries),
-    [template.industries, selectedFilter]
+    [getIndustryTag, template.industries]
   );
 
   return (

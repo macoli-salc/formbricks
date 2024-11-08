@@ -14,8 +14,8 @@ import { ClientLogout } from "@formbricks/ui/components/ClientLogout";
 import { CreateOrganization } from "./components/CreateOrganization";
 
 export const metadata: Metadata = {
-  title: "Create Organization",
-  description: "Open-source Experience Management. Free & open source.",
+  title: "Criar Organização",
+  description: "Escuta AI - Ouça seus clientes para crescer rápido com IA",
 };
 
 const Page = async () => {

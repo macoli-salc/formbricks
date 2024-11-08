@@ -9,8 +9,8 @@ import { verifyUserRoleAccess } from "@formbricks/lib/organization/auth";
 import { AuthenticationError } from "@formbricks/types/errors";
 
 export const metadata: Metadata = {
-  title: "Invite",
-  description: "Open-source Experience Management. Free & open source.",
+  title: "Convidar",
+  description: "Escuta AI - Ouça seus clientes para crescer rápido com IA",
 };
 
 const Page = async ({ params }) => {
