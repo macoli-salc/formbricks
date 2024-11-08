@@ -245,11 +245,6 @@ const nextConfig = {
   },
 };
 
-// set custom cache handler
-if (process.env.CUSTOM_CACHE_DISABLED !== "1") {
-  nextConfig.cacheHandler = require.resolve("./cache-handler.mjs");
-}
-
 // set actions allowed origins
 if (process.env.WEBAPP_URL) {
   nextConfig.experimental.serverActions = {
