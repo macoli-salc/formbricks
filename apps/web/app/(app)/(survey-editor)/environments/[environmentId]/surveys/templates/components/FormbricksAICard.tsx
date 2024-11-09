@@ -8,14 +8,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { getFormattedErrorMessage } from "@formbricks/lib/actionClient/helper";
 import { Button } from "@formbricks/ui/components/Button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@formbricks/ui/components/Card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader } from "@formbricks/ui/components/Card";
 import { Textarea } from "@formbricks/ui/components/Textarea";
 
 interface FormbricksAICardProps {

@@ -56,7 +56,7 @@ const Page = async ({ params }: { params: { environmentId: string } }) => {
   const isLeaveOrganizationDisabled = userMemberships.length <= 1;
   const isUserAdminOrOwner = isAdmin || isOwner;
 
-  const isOrganizationAIReady = await getIsOrganizationAIReady(organization.billing.plan);
+  const isOrganizationAIReady = await getIsOrganizationAIReady();
 
   return (
     <PageContentWrapper>

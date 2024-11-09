@@ -1,6 +1,5 @@
 "use client";
 
-import { getLatestStableFbReleaseAction } from "@/app/(app)/environments/[environmentId]/actions/actions";
 import { NavigationLink } from "@/app/(app)/environments/[environmentId]/components/NavigationLink";
 import { formbricksLogout } from "@/app/lib/formbricks";
 import EscutaAILogo from "@/images/escuta-ai-wordmark.svg";
@@ -22,7 +21,6 @@ import {
   PanelLeftCloseIcon,
   PanelLeftOpenIcon,
   PlusIcon,
-  RocketIcon,
   UserCircleIcon,
   UserIcon,
   UsersIcon,
@@ -58,7 +56,6 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@formbricks/ui/components/DropdownMenu";
-import packageJson from "../../../../../package.json";
 
 interface NavigationProps {
   environment: TEnvironment;
@@ -79,7 +76,6 @@ export const MainNavigation = ({
   user,
   products,
   isMultiOrgEnabled,
-  isFormbricksCloud = true,
   membershipRole,
   isAIEnabled = false,
 }: NavigationProps) => {
@@ -91,7 +87,6 @@ export const MainNavigation = ({
   const [showCreateOrganizationModal, setShowCreateOrganizationModal] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isTextVisible, setIsTextVisible] = useState(true);
-  const [latestVersion, setLatestVersion] = useState("");
 
   const product = products.find((product) => product.id === environment.productId);
   const { isAdmin, isOwner, isViewer } = getAccessFlags(membershipRole);
@@ -246,21 +241,6 @@ export const MainNavigation = ({
       icon: AiOutlineDiscord,
     },
   ];
-
-  useEffect(() => {
-    async function loadReleases() {
-      const res = await getLatestStableFbReleaseAction();
-      if (res?.data) {
-        const latestVersionTag = res.data;
-        const currentVersionTag = `v${packageJson.version}`;
-
-        if (currentVersionTag !== latestVersionTag) {
-          setLatestVersion(latestVersionTag);
-        }
-      }
-    }
-    if (isOwnerOrAdmin) loadReleases();
-  }, [isOwnerOrAdmin]);
 
   return (
     <>
