@@ -24,12 +24,7 @@ const Page = async ({ params }) => {
   }
 
   const HowToAddAttributesButton = (
-    <Button
-      size="sm"
-      href="https://formbricks.com/docs/app-surveys/user-identification#setting-custom-user-attributes"
-      variant="secondary"
-      target="_blank"
-      EndIcon={CircleHelpIcon}>
+    <Button size="sm" href="https://escuta.ai" variant="secondary" target="_blank" EndIcon={CircleHelpIcon}>
       {t("environments.attributes.how_to_add_attributes")}
     </Button>
   );

@@ -74,7 +74,7 @@ const WebAppTab = ({ environmentId }) => {
         <li>
           {t("environments.surveys.summary.learn_how_to")}{" "}
           <Link
-            href="https://formbricks.com/docs/app-surveys/user-identification"
+            href="https://escuta.ai"
             target="_blank"
             className="decoration-brand-dark font-medium underline underline-offset-2">
             {t("environments.surveys.summary.identify_users_and_set_attributes")}

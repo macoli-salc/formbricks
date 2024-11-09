@@ -182,7 +182,7 @@ const Page = async ({ params }) => {
       connectHref: `/environments/${params.environmentId}/integrations/notion`,
       connectText: `${isNotionIntegrationConnected ? t("common.manage") : t("common.connect")}`,
       connectNewTab: false,
-      docsHref: "https://formbricks.com/docs/integrations/notion",
+      docsHref: "https://escuta.ai",
       docsText: t("common.docs"),
       docsNewTab: true,
       label: "Notion",
@@ -194,7 +194,7 @@ const Page = async ({ params }) => {
   ];
 
   integrationCards.unshift({
-    docsHref: "https://formbricks.com/docs/app-surveys/quickstart",
+    docsHref: "https://escuta.ai",
     docsText: t("common.docs"),
     docsNewTab: true,
     connectHref: `/environments/${environmentId}/product/app-connection`,

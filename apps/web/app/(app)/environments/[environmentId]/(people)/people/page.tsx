@@ -16,12 +16,7 @@ const Page = async ({ params }: { params: { environmentId: string } }) => {
   }
 
   const HowToAddPeopleButton = (
-    <Button
-      size="sm"
-      href="https://formbricks.com/docs/app-surveys/user-identification"
-      variant="secondary"
-      target="_blank"
-      EndIcon={CircleHelpIcon}>
+    <Button size="sm" href="https://escuta.ai" variant="secondary" target="_blank" EndIcon={CircleHelpIcon}>
       {t("environments.people.how_to_add_people")}
     </Button>
   );
