@@ -184,6 +184,7 @@ export const MainNavigation = ({
         href: `/environments/${environment.id}/actions`,
         icon: MousePointerClick,
         isActive: pathname?.includes("/actions") || pathname?.includes("/actions"),
+        isHidden: true,
       },
       {
         name: t("common.integrations"),
