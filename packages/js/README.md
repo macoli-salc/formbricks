@@ -1,36 +1,36 @@
-# Formbricks Browser JS Library
+# Escuta AI Browser JS Library
 
-[![npm package](https://img.shields.io/npm/v/@formbricks/js?style=flat-square)](https://www.npmjs.com/package/@formbricks/js)
+[![npm package](https://img.shields.io/npm/v/@escutaai/js?style=flat-square)](https://www.npmjs.com/package/@escutaai/js)
 [![MIT License](https://img.shields.io/badge/License-MIT-red.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
-Please see [Formbricks Docs](https://formbricks.com/docs).
-Specifically, [Quickstart/Implementation details](https://formbricks.com/docs/getting-started/quickstart-in-app-survey).
+Please see [Escuta AI Docs](https://escutaai.com).
+Specifically, [Quickstart/Implementation details](https://escutaai).
 
-## What is Formbricks
+## What is Escuta AI
 
-Formbricks is your go-to solution for in-product micro-surveys that will supercharge your product experience! 🚀 For more information please check out [formbricks.com](https://formbricks.com).
+escutaai is your go-to solution for in-product micro-surveys that will supercharge your product experience! 🚀 For more information please check out [escutaai.com](https://escutaai.com).
 
-## How to use this library
+## How to use this librarys
 
-1. Install the Formbricks package inside your project using npm:
+1. Install the escutaai package inside your project using npm:
 
 ```bash
-npm install @formbricks/js
+npm install @escutaai/js
 ```
 
-1. Import Formbricks and initialize the widget in your main component (e.g., App.tsx or App.js):
+1. Import escutaai and initialize the widget in your main component (e.g., App.tsx or App.js):
 
 ```javascript
-import formbricks from "@formbricks/js";
+import escutaai from "@escutaai/js";
 
 if (typeof window !== "undefined") {
-  formbricks.init({
+  escutaai.init({
     environmentId: "your-environment-id",
     apiHost: "https://app.escuta.ai",
   });
 }
 ```
 
-Replace your-environment-id with your actual environment ID. You can find your environment ID in the **Setup Checklist** in the Formbricks settings. If you want to use the user identification feature, please check out [our docs for details](https://formbricks.com/docs/app-surveys/user-identification).
+Replace your-environment-id with your actual environment ID. You can find your environment ID in the **Setup Checklist** in the escutaai settings. If you want to use the user identification feature, please check out [our docs for details](https://app.escuta.ai).
 
-For more detailed guides for different frameworks, check out our [Framework Guides](https://formbricks.com/docs/getting-started/framework-guides).
+For more detailed guides for different frameworks, check out our [Framework Guides](https://app.escuta.ai).
