@@ -24,7 +24,8 @@ export const TemplateFilters = ({
     setSelectedFilter(newFilter);
   };
 
-  const allFilters = [channelMapping, industryMapping, roleMapping];
+  const allFilters = [channelMapping, industryMapping];
+  // const allFilters = [channelMapping, industryMapping, roleMapping];
 
   return (
     <div className="mb-6 gap-3">
