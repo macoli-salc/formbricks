@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import { cn } from "@formbricks/lib/cn";
 import { TTemplateFilter } from "@formbricks/types/templates";
-import { channelMapping, industryMapping, roleMapping } from "../lib/utils";
+import { channelMapping, industryMapping } from "../lib/utils";
 
 interface TemplateFiltersProps {
   selectedFilter: TTemplateFilter[];
