@@ -40,7 +40,7 @@ export const ExperiencePage = async ({ params }) => {
     throw new Error("Organization not found");
   }
 
-  const isAIEnabled = await getIsAIEnabled(organization);
+  const isAIEnabled = await getIsAIEnabled();
 
   if (!isAIEnabled) {
     notFound();

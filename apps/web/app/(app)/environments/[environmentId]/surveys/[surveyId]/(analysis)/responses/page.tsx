@@ -63,7 +63,7 @@ const Page = async ({ params }) => {
 
   const { isViewer } = getAccessFlags(currentUserMembership?.role);
 
-  const isAIEnabled = await getIsAIEnabled(organization);
+  const isAIEnabled = await getIsAIEnabled();
   const shouldGenerateInsights = needsInsightsGeneration(survey);
   const locale = findMatchingLocale();
 

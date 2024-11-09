@@ -106,12 +106,30 @@ export const getInsightsEnabled = async (question: TSurveyQuestion): Promise<boo
       schema: z.object({
         insightsEnabled: z.boolean(),
       }),
-      prompt: `We extract insights (e.g. feature requests, complaints, other) from survey questions. Can we find them in this question?: ${question.headline.default}`,
+      system: `You are an AI expert in survey analysis and user feedback categorization. Your task is to determine if meaningful insights can be extracted from open-ended survey questions. Focus on identifying if the question can elicit:
+    - Customer feedback about products/services
+    - Feature requests or improvement suggestions
+    - Pain points or complaints
+    - User experience descriptions
+    - General sentiment and satisfaction levels
+    - Product usage patterns
+    Only return true if the question can generate actionable or analyzable responses.`,
+
+      prompt: `Analyze this survey question: "${question.headline.default}"
+    
+    Consider:
+    1. Is this an open-ended question that allows for detailed responses?
+    2. Can the potential answers provide actionable feedback or meaningful insights?
+    3. Would responses likely contain specific details rather than just yes/no or numerical ratings?
+    4. Could the answers reveal patterns or trends in user behavior/feedback?
+    
+    Return true only if meaningful insights can be extracted from the responses.`,
       experimental_telemetry: { isEnabled: true },
     });
 
     return object.insightsEnabled;
   } catch (error) {
+    console.log({ error });
     throw error;
   }
 };

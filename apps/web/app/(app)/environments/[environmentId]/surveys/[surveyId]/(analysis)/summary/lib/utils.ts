@@ -40,9 +40,8 @@ export const constructToastMessage = (
 
 export const needsInsightsGeneration = (survey: TSurvey): boolean => {
   const openTextQuestions = survey.questions.filter((question) => question.type === "openText");
-  const questionWithoutInsightsEnabled = openTextQuestions.some(
-    (question) => question.type === "openText" && typeof question.insightsEnabled === "undefined"
-  );
-
-  return openTextQuestions.length > 0 && questionWithoutInsightsEnabled;
+  // const questionWithoutInsightsEnabled = openTextQuestions.some(
+  //   (question) => question.type === "openText" && typeof question.insightsEnabled === "undefined"
+  // );
+  return openTextQuestions.length > 0;
 };

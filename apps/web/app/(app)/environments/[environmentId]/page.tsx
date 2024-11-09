@@ -11,7 +11,7 @@ const Page = async ({ params }) => {
     throw new Error(t("common.organization_not_found"));
   }
 
-  const isAIEnabled = await getIsAIEnabled(organization);
+  const isAIEnabled = await getIsAIEnabled();
 
   if (isAIEnabled) {
     return redirect(`/environments/${params.environmentId}/experience`);

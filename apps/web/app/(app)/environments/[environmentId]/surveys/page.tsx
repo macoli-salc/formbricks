@@ -1,3 +1,4 @@
+import { FormbricksAICard } from "@/app/(app)/(survey-editor)/environments/[environmentId]/surveys/templates/components/FormbricksAICard";
 import { SurveysList } from "@/app/(app)/environments/[environmentId]/surveys/components/SurveyList";
 import { PlusIcon } from "lucide-react";
 import { Metadata } from "next";
@@ -17,6 +18,7 @@ import { TTemplateRole } from "@formbricks/types/templates";
 import { Button } from "@formbricks/ui/components/Button";
 import { PageContentWrapper } from "@formbricks/ui/components/PageContentWrapper";
 import { PageHeader } from "@formbricks/ui/components/PageHeader";
+import { Separator } from "@formbricks/ui/components/Separator";
 import { TemplateList } from "@formbricks/ui/components/TemplateList";
 
 export const metadata: Metadata = {
@@ -66,8 +68,6 @@ const Page = async ({ params, searchParams }: SurveyTemplateProps) => {
 
   const surveyCount = await getSurveyCount(params.environmentId);
 
-  console.log({ surveyCount });
-
   const environments = await getEnvironments(product.id);
   const otherEnvironment = environments.find((e) => e.type !== environment.type)!;
 
@@ -112,12 +112,25 @@ const Page = async ({ params, searchParams }: SurveyTemplateProps) => {
           <h1 className="px-6 text-3xl font-extrabold text-slate-700">
             {t("environments.surveys.all_set_time_to_create_first_survey")}
           </h1>
-          <TemplateList
-            environment={environment}
-            product={product}
-            user={user}
-            prefilledFilters={prefilledFilters}
-          />
+          <Separator className="mt-4" />
+          <div className="px-6">
+            <h2 className="mb-4 text-xl font-semibold text-slate-700">
+              Use nossa IA para criar a pesquisa sob medida
+            </h2>
+            <FormbricksAICard environmentId={environment.id} />
+          </div>
+          <Separator className="mt-4" />
+          <div className="px-6">
+            <h2 className="mb-4 text-xl font-semibold text-slate-700">
+              Ou escolha um de nossos templates pré-definidos
+            </h2>
+            <TemplateList
+              environment={environment}
+              product={product}
+              user={user}
+              prefilledFilters={prefilledFilters}
+            />
+          </div>
         </>
       )}
     </PageContentWrapper>

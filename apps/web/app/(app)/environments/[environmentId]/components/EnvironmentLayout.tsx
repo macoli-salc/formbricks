@@ -1,5 +1,4 @@
 import { MainNavigation } from "@/app/(app)/environments/[environmentId]/components/MainNavigation";
-import { TopControlBar } from "@/app/(app)/environments/[environmentId]/components/TopControlBar";
 import { getIsAIEnabled } from "@/app/lib/utils";
 import type { Session } from "next-auth";
 import { getTranslations } from "next-intl/server";
@@ -70,7 +69,7 @@ export const EnvironmentLayout = async ({ environmentId, session, children }: En
     ]);
   }
 
-  const isAIEnabled = await getIsAIEnabled(organization);
+  const isAIEnabled = await getIsAIEnabled();
 
   return (
     <div className="flex h-screen min-h-screen flex-col overflow-hidden">
@@ -105,12 +104,7 @@ export const EnvironmentLayout = async ({ environmentId, session, children }: En
           isAIEnabled={isAIEnabled}
         />
         <div id="mainContent" className="flex-1 overflow-y-auto bg-slate-50">
-          <TopControlBar
-            environment={environment}
-            environments={environments}
-            membershipRole={currentUserMembership?.role}
-          />
-          <div className="mt-14">{children}</div>
+          <div className="mt-2">{children}</div>
         </div>
       </div>
     </div>

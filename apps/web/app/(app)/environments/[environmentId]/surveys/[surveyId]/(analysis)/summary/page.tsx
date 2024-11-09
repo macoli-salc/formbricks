@@ -73,7 +73,7 @@ const Page = async ({ params }) => {
   // I took this out cause it's cloud only right?
   // const { active: isEnterpriseEdition } = await getEnterpriseLicense();
 
-  const isAIEnabled = await getIsAIEnabled(organization);
+  const isAIEnabled = await getIsAIEnabled();
   const shouldGenerateInsights = needsInsightsGeneration(survey);
 
   return (

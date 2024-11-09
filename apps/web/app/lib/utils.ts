@@ -1,7 +1,4 @@
-import { getEnterpriseLicense } from "@formbricks/ee/lib/service";
-import { IS_AI_CONFIGURED, IS_FORMBRICKS_CLOUD } from "@formbricks/lib/constants";
 import { TInvite } from "@formbricks/types/invites";
-import { TOrganization, TOrganizationBillingPlan } from "@formbricks/types/organizations";
 
 export const isInviteExpired = (invite: TInvite) => {
   const now = new Date();
@@ -9,19 +6,12 @@ export const isInviteExpired = (invite: TInvite) => {
   return now > expiresAt;
 };
 
-export const getIsOrganizationAIReady = async (billingPlan: TOrganizationBillingPlan) => {
-  const { active: isEnterpriseEdition } = await getEnterpriseLicense();
-
+export const getIsOrganizationAIReady = async () => {
   // TODO: We'll remove the IS_FORMBRICKS_CLOUD check once we have the AI feature available for self-hosted customers
-  return Boolean(
-    IS_FORMBRICKS_CLOUD &&
-      IS_AI_CONFIGURED &&
-      isEnterpriseEdition &&
-      (billingPlan === "startup" || billingPlan === "scale" || billingPlan === "enterprise")
-  );
+  return Boolean(true);
 };
 
-export const getIsAIEnabled = async (organization: TOrganization) => {
-  const isOrganizationAIReady = await getIsOrganizationAIReady(organization.billing.plan);
-  return Boolean(isOrganizationAIReady && organization.isAIEnabled);
+export const getIsAIEnabled = async () => {
+  const isOrganizationAIReady = await getIsOrganizationAIReady();
+  return Boolean(isOrganizationAIReady);
 };

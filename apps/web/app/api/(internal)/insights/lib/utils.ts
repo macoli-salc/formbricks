@@ -1,7 +1,6 @@
 import "server-only";
 import { prisma } from "@formbricks/database";
 import { CRON_SECRET, WEBAPP_URL } from "@formbricks/lib/constants";
-import { surveyCache } from "@formbricks/lib/survey/cache";
 import { doesSurveyHasOpenTextQuestion, getInsightsEnabled } from "@formbricks/lib/survey/utils";
 import { validateInputs } from "@formbricks/lib/utils/validate";
 import { ZId } from "@formbricks/types/common";
@@ -64,13 +63,13 @@ export const generateInsightsEnabledForSurveyQuestions = async (
 
     const openTextQuestions = survey.questions.filter((question) => question.type === "openText");
 
-    const openTextQuestionsWithoutInsightsEnabled = openTextQuestions.filter(
-      (question) => question.type === "openText" && typeof question.insightsEnabled === "undefined"
-    );
+    // const openTextQuestionsWithoutInsightsEnabled = openTextQuestions.filter(
+    //   (question) => question.type === "openText" && typeof question.insightsEnabled === "undefined"
+    // );
 
-    if (openTextQuestionsWithoutInsightsEnabled.length === 0) {
-      return { success: false };
-    }
+    // if (openTextQuestionsWithoutInsightsEnabled.length === 0) {
+    //   return { success: false };
+    // }
 
     const insightsEnabledValues = await Promise.allSettled(
       openTextQuestions.map(async (question) => {
@@ -114,8 +113,6 @@ export const generateInsightsEnabledForSurveyQuestions = async (
         questions: true,
       },
     });
-
-    surveyCache.revalidate({ id: surveyId, environmentId: survey.environmentId });
 
     if (insightsEnabledQuestionIds.length > 0) {
       return { success: true, survey: updatedSurvey };

@@ -146,7 +146,7 @@ export const POST = async (request: Request) => {
           throw new Error("Organization not found");
         }
 
-        const isAIEnabled = await getIsAIEnabled(organization);
+        const isAIEnabled = await getIsAIEnabled();
 
         if (isAIEnabled) {
           for (const question of survey.questions) {

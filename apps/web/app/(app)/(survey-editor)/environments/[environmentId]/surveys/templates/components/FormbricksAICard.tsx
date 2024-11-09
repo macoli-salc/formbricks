@@ -51,7 +51,6 @@ export const FormbricksAICard = ({ environmentId }: FormbricksAICardProps) => {
   return (
     <Card className="mx-auto w-full bg-gradient-to-tr from-slate-100 to-slate-200">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">EscutaAI</CardTitle>
         <CardDescription>{t("environments.surveys.templates.formbricks_ai_description")}</CardDescription>
       </CardHeader>
       <CardContent>

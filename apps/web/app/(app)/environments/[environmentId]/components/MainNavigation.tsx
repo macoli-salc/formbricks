@@ -323,7 +323,7 @@ export const MainNavigation = ({
           {/* Product Switch */}
           <div>
             {/* New Version Available */}
-            {!isCollapsed && isOwnerOrAdmin && latestVersion && !isFormbricksCloud && (
+            {/* {!isCollapsed && isOwnerOrAdmin && latestVersion && !isFormbricksCloud && (
               <Link
                 href="https://github.com/formbricks/formbricks/releases"
                 target="_blank"
@@ -333,7 +333,7 @@ export const MainNavigation = ({
                   {t("common.new_version_available", { version: latestVersion })}
                 </p>
               </Link>
-            )}
+            )} */}
             <DropdownMenu>
               <DropdownMenuTrigger
                 asChild
