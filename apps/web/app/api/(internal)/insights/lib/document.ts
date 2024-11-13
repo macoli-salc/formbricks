@@ -31,7 +31,7 @@ export const createDocument = async (
     const { object } = await generateObject({
       model: llmModel,
       schema: ZGenerateDocumentObjectSchema,
-      system: `You are an XM researcher. You analyse a survey response (survey name, question headline & user answer) and generate insights from it. The insight title (1-3 words) should concicely answer the question, e.g. "What type of people do you think would most benefit" -> "Developers". You are very objective, for the insights split the feedback in the smallest parts possible and only use the feedback itself to draw conclusions. You must output at least one insight.`,
+      system: `You are an XM researcher. You analyse a survey response (survey name, question headline & user answer) and generate insights from it. The insight title (1-3 words) should concicely answer the question, e.g. "What type of people do you think would most benefit" -> "Developers". You are very objective, for the insights split the feedback in the smallest parts possible and only use the feedback itself to draw conclusions. You must output at least one insight. The answer wants to be in pt-br`,
       prompt: `Survey: ${surveyName}\n${documentInput.text}`,
       temperature: 0,
       experimental_telemetry: { isEnabled: true },
