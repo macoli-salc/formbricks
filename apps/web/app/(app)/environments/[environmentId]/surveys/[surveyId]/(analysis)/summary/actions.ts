@@ -37,7 +37,7 @@ export const sendEmbedSurveyPreviewEmailAction = authenticatedActionClient
 
     return await sendEmbedSurveyPreviewEmail(
       ctx.user.email,
-      "Formbricks Email Survey Preview",
+      "Visualização da pesquisa",
       emailHtml,
       survey.environmentId,
       ctx.user.locale
