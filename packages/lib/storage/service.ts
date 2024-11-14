@@ -234,6 +234,9 @@ export const getS3UploadSignedUrl = async (
       Fields: {
         "Content-Type": contentType,
         "Content-Encoding": "base64",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+        "Access-Control-Allow-Headers": "Content-Type",
       },
       Conditions: postConditions,
     });
