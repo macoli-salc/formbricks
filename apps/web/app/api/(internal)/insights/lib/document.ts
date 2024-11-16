@@ -28,11 +28,36 @@ export const createDocument = async (
     });
 
     // generate sentiment and insights
+    // const { object } = await generateObject({
+    //   model: llmModel,
+    //   schema: ZGenerateDocumentObjectSchema,
+    //   system: `You are an XM researcher. You analyse a survey response (survey name, question headline & user answer) and generate insights from it. The insight title (1-3 words) should concicely answer the question, e.g. "What type of people do you think would most benefit" -> "Developers". You are very objective, for the insights split the feedback in the smallest parts possible and only use the feedback itself to draw conclusions. You must output at least one insight. The answer wants to be in pt-br`,
+    //   prompt: `Survey: ${surveyName}\n${documentInput.text}`,
+    //   temperature: 0,
+    //   experimental_telemetry: { isEnabled: true },
+    // });
+
     const { object } = await generateObject({
       model: llmModel,
       schema: ZGenerateDocumentObjectSchema,
-      system: `You are an XM researcher. You analyse a survey response (survey name, question headline & user answer) and generate insights from it. The insight title (1-3 words) should concicely answer the question, e.g. "What type of people do you think would most benefit" -> "Developers". You are very objective, for the insights split the feedback in the smallest parts possible and only use the feedback itself to draw conclusions. You must output at least one insight. The answer wants to be in pt-br`,
-      prompt: `Survey: ${surveyName}\n${documentInput.text}`,
+      system: `Você é um pesquisador de XM que analisa respostas de pesquisas (nome da pesquisa, título da pergunta e resposta do usuário) e gera insights. 
+    O título do insight (1-3 palavras) deve responder concisamente a pergunta, exemplo: "Que tipo de pessoas mais se beneficiariam" -> "Cliente". 
+    Seja muito objetivo, divida o feedback nas menores partes possíveis e use apenas o próprio feedback para tirar conclusões.
+    Você deve gerar pelo menos um insight.
+    Todas as suas respostas DEVEM ser em português do Brasil (PT-BR), incluindo títulos e descrições.
+    IMPORTANTE: Nunca use palavras em inglês, sempre use o equivalente em português.
+    
+    Categorias de sentimento devem ser exatamente:
+    - "positivo"
+    - "neutro" 
+    - "negativo"
+    
+    Categorias de insights devem ser exatamente:
+    - "elogio"
+    - "pedido de recurso"  
+    - "reclamação"
+    - "outro"`,
+      prompt: `Pesquisa: ${surveyName}\n${documentInput.text}`,
       temperature: 0,
       experimental_telemetry: { isEnabled: true },
     });
