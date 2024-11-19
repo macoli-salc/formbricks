@@ -57,7 +57,7 @@ export const createAISurveyAction = authenticatedActionClient
           })
         ),
       }),
-      system: `You are a survey AI. Create a survey with 5 questions max that fits the schema and user input and if is not multiple choice dont create the choices object.`,
+      system: `You are a survey AI. Create a survey with 5 questions max that fits the schema and user input and if is not multiple choice dont create the choices object. All output must be in Brazilian Portuguese.`,
       prompt: parsedInput.prompt,
       experimental_telemetry: { isEnabled: true },
     });
