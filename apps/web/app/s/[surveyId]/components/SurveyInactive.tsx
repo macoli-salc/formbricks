@@ -1,10 +1,11 @@
+// import footerLogo from "../lib/footerlogo.svg";
+import footerLogo from "@/images/escuta-ai-wordmark.svg";
 import { CheckCircle2Icon, HelpCircleIcon, PauseCircleIcon } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Image from "next/image";
 import Link from "next/link";
 import { TSurveyClosedMessage } from "@formbricks/types/surveys/types";
 import { Button } from "@formbricks/ui/components/Button";
-import footerLogo from "../lib/footerlogo.svg";
 
 export const SurveyInactive = async ({
   status,
@@ -42,13 +43,13 @@ export const SurveyInactive = async ({
             : descriptions[status]}
         </p>
         {!(status === "completed" && surveyClosedMessage) && status !== "link invalid" && (
-          <Button className="mt-2" href="https://formbricks.com">
+          <Button className="mt-2" href="https://escuta.ai">
             {t("s.create_your_own")}
           </Button>
         )}
       </div>
       <div>
-        <Link href="https://formbricks.com">
+        <Link href="https://escuta.ai">
           <Image src={footerLogo} alt="Brand logo" className="mx-auto w-40" />
         </Link>
       </div>
