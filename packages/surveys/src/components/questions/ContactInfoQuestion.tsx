@@ -53,12 +53,12 @@ export const ContactInfoQuestion = ({
   const fields = [
     {
       id: "firstName",
-      placeholder: "First Name",
+      placeholder: "Primeiro Nome",
       ...question.firstName,
     },
     {
       id: "lastName",
-      placeholder: "Last Name",
+      placeholder: "Sobrenome",
       ...question.lastName,
     },
     {
@@ -68,12 +68,12 @@ export const ContactInfoQuestion = ({
     },
     {
       id: "phone",
-      placeholder: "Phone",
+      placeholder: "Celular",
       ...question.phone,
     },
     {
       id: "company",
-      placeholder: "Company",
+      placeholder: "Empresa",
       ...question.company,
     },
   ];
