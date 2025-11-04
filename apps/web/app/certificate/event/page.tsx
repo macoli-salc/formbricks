@@ -494,23 +494,29 @@ export default function CertificatePage() {
                         lineHeight: "1.4",
                         textAlign: "center",
                       }}>
+                      <img
+                        src="/certificate/assinatura.png"
+                        alt="Assinatura"
+                        style={{
+                          maxHeight: "clamp(35px, 8vw,30px)",
+                          width: "auto",
+                          margin: "0 auto 0",
+                          display: "block",
+                        }}
+                      />
                       <div
                         style={{
                           borderTop: "2px solid #000",
                           width: "40%",
-                          margin: "clamp(15px, 4vw, 40px) auto 5px",
+                          margin: "-5px auto 0px",
                         }}
                       />
-                      <p style={{ margin: "0", fontSize: "clamp(8px, 1.3vw, 13px)" }}>
-                        Centro das Indústrias do Estado de São Paulo
-                        <br />
-                        Regional Indaiatuba
-                        <br />
+                      <p style={{ margin: "5px 0 0 0", fontSize: "clamp(8px, 1.3vw, 13px)" }}>
                         <span style={{ fontWeight: "bold", fontSize: "clamp(9px, 1.5vw, 15px)" }}>
-                          Sergio Roberto Wolf
+                          Anita Moraes Parizzi Revolti
                         </span>
                         <br />
-                        Diretor Titular do CIESP Indaiatuba
+                        Gerente do Ciesp Regional Indaiatuba
                       </p>
                     </div>
 
@@ -671,21 +677,29 @@ export default function CertificatePage() {
                       lineHeight: "1.4",
                       textAlign: "center",
                     }}>
+                    <img
+                      src="/certificate/assinatura.png"
+                      alt="Assinatura"
+                      style={{
+                        maxHeight: "40px",
+                        width: "auto",
+                        margin: "-12px auto 0",
+                        display: "block",
+                      }}
+                    />
                     <div
                       style={{
                         borderTop: "2px solid #000",
                         width: "40%",
-                        margin: "40px auto 5px",
+                        margin: "-12px auto 0px",
                       }}
                     />
-                    <p style={{ margin: "0", fontSize: "13px" }}>
-                      Centro das Indústrias do Estado de São Paulo
+                    <p style={{ margin: "5px 0 0 0", fontSize: "13px" }}>
+                      <span style={{ fontWeight: "bold", fontSize: "15px" }}>
+                        Anita Moraes Parizzi Revolti
+                      </span>
                       <br />
-                      Regional Indaiatuba
-                      <br />
-                      <span style={{ fontWeight: "bold", fontSize: "15px" }}>Sergio Roberto Wolf</span>
-                      <br />
-                      Diretor Titular do CIESP Indaiatuba
+                      Gerente do Ciesp Regional Indaiatuba
                     </p>
                   </div>
 
