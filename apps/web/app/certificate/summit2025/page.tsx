@@ -98,20 +98,48 @@ export default function CertificatePage() {
       const html2pdf = (await import("html2pdf.js")).default;
 
       const element = certificateRef.current;
-      await html2pdf()
+      const filename = `Certificado_${formData.name.replace(/\s+/g, "_")}.pdf`;
+
+      // Detecta iOS/Safari
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !("MSStream" in window);
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+      const pdfWorker = html2pdf()
         .set({
-          filename: `Certificado_${formData.name.replace(/\s+/g, "_")}.pdf`,
           margin: 0,
           html2canvas: {
             scale: 2,
             useCORS: true,
+            logging: false,
             width: element.offsetWidth,
             height: element.offsetHeight,
           },
           jsPDF: { orientation: "landscape", format: "a4" },
         })
-        .from(element)
-        .save();
+        .from(element);
+
+      // Para iOS/Safari, usa método alternativo mais compatível
+      if (isIOS || isSafari) {
+        const blob = await pdfWorker.output("blob");
+        const url = URL.createObjectURL(blob);
+
+        // Cria link temporário e força download
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        link.style.display = "none";
+        document.body.appendChild(link);
+        link.click();
+
+        // Limpa
+        setTimeout(() => {
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        }, 100);
+      } else {
+        // Método padrão para outros navegadores
+        await pdfWorker.save(filename);
+      }
 
       setShowSuccessMessage(true);
       setTimeout(() => setShowSuccessMessage(false), 3000);
@@ -185,8 +213,9 @@ export default function CertificatePage() {
                     id="name"
                     type="text"
                     {...register("name")}
-                    className="w-full rounded-lg border-2 border-slate-300 bg-white px-4 py-3 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border-2 border-slate-300 bg-white px-4 py-3 transition-all duration-200 placeholder:text-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                     placeholder="Digite seu nome completo conforme documento"
+                    style={{ color: "#1f2937" }}
                   />
                   {errors.name && (
                     <p className="mt-2 flex items-center gap-1 text-sm text-red-600">
@@ -217,7 +246,7 @@ export default function CertificatePage() {
                       }}
                       value={cpfValue || ""}
                       maxLength={14}
-                      className={`w-full rounded-lg border-2 bg-white px-4 py-3 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 ${
+                      className={`w-full rounded-lg border-2 bg-white px-4 py-3 transition-all duration-200 placeholder:text-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 ${
                         cpfStatus === "valid"
                           ? "border-green-500"
                           : cpfStatus === "invalid"
@@ -225,6 +254,7 @@ export default function CertificatePage() {
                             : "border-slate-300"
                       }`}
                       placeholder="000.000.000-00"
+                      style={{ color: "#1f2937" }}
                     />
                     {cpfValue && cpfStatus === "valid" && (
                       <svg
@@ -273,8 +303,9 @@ export default function CertificatePage() {
                     id="company"
                     type="text"
                     {...register("company")}
-                    className="w-full rounded-lg border-2 border-slate-300 bg-white px-4 py-3 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border-2 border-slate-300 bg-white px-4 py-3 transition-all duration-200 placeholder:text-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
                     placeholder="Digite o nome da empresa representada"
+                    style={{ color: "#1f2937" }}
                   />
                   {errors.company && (
                     <p className="mt-2 flex items-center gap-1 text-sm text-red-600">
@@ -293,7 +324,7 @@ export default function CertificatePage() {
                 <div className="border-t border-slate-200 pt-4">
                   <button
                     type="submit"
-                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-[#E2377B] bg-gradient-to-r px-6 py-4 font-bold text-white shadow-lg transition-all duration-200 hover:shadow-xl">
+                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-[#E2377B] px-6 py-4 font-bold text-white shadow-lg transition-all duration-200 hover:bg-[#C92F6B] hover:shadow-xl">
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
@@ -412,14 +443,14 @@ export default function CertificatePage() {
                         alt="Logo CIESP"
                         width={120}
                         height={85}
-                        style={{ height: "85px", width: "auto" }}
+                        style={{ height: "85px", width: "auto", maxWidth: "120px", objectFit: "contain" }}
                       />
                       <Image
                         src="/certificate/event/assets/logo-evento.png"
                         alt="Logo do Evento"
                         width={120}
                         height={85}
-                        style={{ height: "85px", width: "auto" }}
+                        style={{ height: "85px", width: "auto", maxWidth: "120px", objectFit: "contain" }}
                       />
                     </div>
 
@@ -607,14 +638,24 @@ export default function CertificatePage() {
                       alt="Logo CIESP"
                       width={120}
                       height={85}
-                      style={{ height: "clamp(30px, 8vw, 85px)", width: "auto" }}
+                      style={{
+                        height: "clamp(30px, 8vw, 85px)",
+                        width: "auto",
+                        maxWidth: "120px",
+                        objectFit: "contain",
+                      }}
                     />
                     <Image
                       src="/certificate/event/assets/logo-evento.png"
                       alt="Logo do Evento"
                       width={120}
                       height={85}
-                      style={{ height: "clamp(30px, 8vw, 85px)", width: "auto" }}
+                      style={{
+                        height: "clamp(30px, 8vw, 85px)",
+                        width: "auto",
+                        maxWidth: "120px",
+                        objectFit: "contain",
+                      }}
                     />
                   </div>
 
