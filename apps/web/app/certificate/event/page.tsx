@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -70,7 +71,6 @@ export default function CertificatePage() {
   const [formData, setFormData] = useState<CertificateFormData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [formStage, setFormStage] = useState<1 | 2>(1);
   const certificateRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -88,7 +88,6 @@ export default function CertificatePage() {
 
   const onSubmit = (data: CertificateFormData) => {
     setFormData(data);
-    setFormStage(2);
   };
 
   const generatePDF = async () => {
@@ -128,7 +127,7 @@ export default function CertificatePage() {
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
       <header className="bg-gradient-to-r px-4 py-2 shadow-md">
         <nav className="mx-auto flex max-w-7xl items-center justify-end text-sm">
-          <img src="/escuta.svg" alt="Escuta Logo" className="h-5" />
+          <Image src="/escuta.svg" alt="Escuta Logo" width={80} height={20} className="h-5" />
         </nav>
       </header>
 
@@ -322,7 +321,6 @@ export default function CertificatePage() {
                 <button
                   onClick={() => {
                     setFormData(null);
-                    setFormStage(1);
                   }}
                   className="inline-flex items-center gap-2 rounded-lg bg-slate-700 px-6 py-3 font-semibold text-white shadow-md transition-all duration-200 hover:bg-slate-600 hover:shadow-lg">
                   <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -409,14 +407,18 @@ export default function CertificatePage() {
                         alignItems: "center",
                         marginBottom: "15px",
                       }}>
-                      <img
+                      <Image
                         src="/certificate/event/assets/logo-ciesp.jpg"
                         alt="Logo CIESP"
+                        width={120}
+                        height={85}
                         style={{ height: "85px", width: "auto" }}
                       />
-                      <img
+                      <Image
                         src="/certificate/event/assets/logo-evento.png"
                         alt="Logo do Evento"
+                        width={120}
+                        height={85}
                         style={{ height: "85px", width: "auto" }}
                       />
                     </div>
@@ -494,9 +496,11 @@ export default function CertificatePage() {
                         lineHeight: "1.4",
                         textAlign: "center",
                       }}>
-                      <img
+                      <Image
                         src="/certificate/assinatura.png"
                         alt="Assinatura"
+                        width={150}
+                        height={40}
                         style={{
                           maxHeight: "clamp(35px, 8vw,30px)",
                           width: "auto",
@@ -529,34 +533,46 @@ export default function CertificatePage() {
                         marginTop: "1em",
                         flexWrap: "wrap",
                       }}>
-                      <img
+                      <Image
                         src="/certificate/event/assets/logo-apollo.png"
                         alt="Apollo"
+                        width={64}
+                        height={32}
                         style={{ maxHeight: "clamp(16px, 3vw, 32px)", width: "auto" }}
                       />
-                      <img
+                      <Image
                         src="/certificate/event/assets/logo-inovares.png"
                         alt="Inovares"
+                        width={64}
+                        height={32}
                         style={{ maxHeight: "clamp(16px, 3vw, 32px)", width: "auto" }}
                       />
-                      <img
+                      <Image
                         src="/certificate/event/assets/logo-profcenter.png"
                         alt="Profcenter"
+                        width={64}
+                        height={32}
                         style={{ maxHeight: "clamp(16px, 3vw, 32px)", width: "auto" }}
                       />
-                      <img
+                      <Image
                         src="/certificate/event/assets/logo-marca.png"
                         alt="Marca Brindes"
+                        width={64}
+                        height={32}
                         style={{ maxHeight: "clamp(16px, 3vw, 32px)", width: "auto" }}
                       />
-                      <img
+                      <Image
                         src="/certificate/event/assets/logo-mediarh.png"
                         alt="MediaRH"
+                        width={64}
+                        height={32}
                         style={{ maxHeight: "clamp(16px, 3vw, 32px)", width: "auto" }}
                       />
-                      <img
+                      <Image
                         src="/certificate/event/assets/logo-sicoob.png"
                         alt="Sicoob"
+                        width={64}
+                        height={32}
                         style={{ maxHeight: "clamp(16px, 3vw, 32px)", width: "auto" }}
                       />
                     </div>
@@ -586,14 +602,18 @@ export default function CertificatePage() {
                       alignItems: "center",
                       marginBottom: "0.5em",
                     }}>
-                    <img
+                    <Image
                       src="/certificate/event/assets/logo-ciesp.jpg"
                       alt="Logo CIESP"
+                      width={120}
+                      height={85}
                       style={{ height: "clamp(30px, 8vw, 85px)", width: "auto" }}
                     />
-                    <img
+                    <Image
                       src="/certificate/event/assets/logo-evento.png"
                       alt="Logo do Evento"
+                      width={120}
+                      height={85}
                       style={{ height: "clamp(30px, 8vw, 85px)", width: "auto" }}
                     />
                   </div>
@@ -677,9 +697,11 @@ export default function CertificatePage() {
                       lineHeight: "1.4",
                       textAlign: "center",
                     }}>
-                    <img
+                    <Image
                       src="/certificate/assinatura.png"
                       alt="Assinatura"
+                      width={150}
+                      height={40}
                       style={{
                         maxHeight: "40px",
                         width: "auto",
@@ -712,34 +734,46 @@ export default function CertificatePage() {
                       marginTop: "25px",
                       flexWrap: "wrap",
                     }}>
-                    <img
+                    <Image
                       src="/certificate/event/assets/logo-apollo.png"
                       alt="Apollo"
+                      width={64}
+                      height={32}
                       style={{ maxHeight: "32px", width: "auto" }}
                     />
-                    <img
+                    <Image
                       src="/certificate/event/assets/logo-inovares.png"
                       alt="Inovares"
+                      width={64}
+                      height={32}
                       style={{ maxHeight: "32px", width: "auto" }}
                     />
-                    <img
+                    <Image
                       src="/certificate/event/assets/logo-profcenter.png"
                       alt="Profcenter"
+                      width={64}
+                      height={32}
                       style={{ maxHeight: "32px", width: "auto" }}
                     />
-                    <img
+                    <Image
                       src="/certificate/event/assets/logo-marca.png"
                       alt="Marca Brindes"
+                      width={64}
+                      height={32}
                       style={{ maxHeight: "32px", width: "auto" }}
                     />
-                    <img
+                    <Image
                       src="/certificate/event/assets/logo-mediarh.png"
                       alt="MediaRH"
+                      width={64}
+                      height={32}
                       style={{ maxHeight: "32px", width: "auto" }}
                     />
-                    <img
+                    <Image
                       src="/certificate/event/assets/logo-sicoob.png"
                       alt="Sicoob"
+                      width={64}
+                      height={32}
                       style={{ maxHeight: "32px", width: "auto" }}
                     />
                   </div>
