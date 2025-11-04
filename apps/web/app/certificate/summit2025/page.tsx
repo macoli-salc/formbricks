@@ -726,7 +726,7 @@ export default function CertificatePage() {
 
                   <div
                     style={{
-                      marginTop: "20px",
+                      marginTop: "35px",
                       fontSize: "15px",
                       lineHeight: "1.4",
                       textAlign: "center",
@@ -739,7 +739,7 @@ export default function CertificatePage() {
                       style={{
                         maxHeight: "32px",
                         width: "auto",
-                        margin: "-10px auto 0",
+                        margin: "5px auto 0",
                         display: "block",
                       }}
                     />
@@ -764,51 +764,51 @@ export default function CertificatePage() {
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
-                      gap: "12px",
-                      marginTop: "12px",
+                      gap: "25px",
+                      marginTop: "25px",
                       flexWrap: "wrap",
                     }}>
                     <Image
                       src="/certificate/event/assets/logo-apollo.png"
                       alt="Apollo"
-                      width={55}
-                      height={28}
-                      style={{ maxHeight: "28px", width: "auto" }}
+                      width={65}
+                      height={33}
+                      style={{ maxHeight: "33px", width: "auto", margin: "0 12px" }}
                     />
                     <Image
                       src="/certificate/event/assets/logo-inovares.png"
                       alt="Inovares"
-                      width={55}
-                      height={28}
-                      style={{ maxHeight: "28px", width: "auto" }}
+                      width={65}
+                      height={33}
+                      style={{ maxHeight: "33px", width: "auto", margin: "0 12px" }}
                     />
                     <Image
                       src="/certificate/event/assets/logo-profcenter.png"
                       alt="Profcenter"
-                      width={55}
-                      height={28}
-                      style={{ maxHeight: "28px", width: "auto" }}
+                      width={65}
+                      height={33}
+                      style={{ maxHeight: "33px", width: "auto", margin: "0 12px" }}
                     />
                     <Image
                       src="/certificate/event/assets/logo-marca.png"
                       alt="Marca Brindes"
-                      width={55}
-                      height={28}
-                      style={{ maxHeight: "28px", width: "auto" }}
+                      width={65}
+                      height={33}
+                      style={{ maxHeight: "33px", width: "auto", margin: "0 12px" }}
                     />
                     <Image
                       src="/certificate/event/assets/logo-mediarh.png"
                       alt="MediaRH"
-                      width={55}
-                      height={28}
-                      style={{ maxHeight: "28px", width: "auto" }}
+                      width={65}
+                      height={33}
+                      style={{ maxHeight: "33px", width: "auto", margin: "0 12px" }}
                     />
                     <Image
                       src="/certificate/event/assets/logo-sicoob.png"
                       alt="Sicoob"
-                      width={55}
-                      height={28}
-                      style={{ maxHeight: "28px", width: "auto" }}
+                      width={65}
+                      height={33}
+                      style={{ maxHeight: "33px", width: "auto", margin: "0 12px" }}
                     />
                   </div>
                 </div>
