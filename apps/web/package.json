@@ -45,6 +45,7 @@
     "file-loader": "6.2.0",
     "framer-motion": "11.11.8",
     "googleapis": "144.0.0",
+    "html2pdf.js": "0.12.1",
     "jiti": "2.3.3",
     "jsonwebtoken": "9.0.2",
     "langfuse-vercel": "3.27.0",
