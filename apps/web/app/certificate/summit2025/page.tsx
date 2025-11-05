@@ -97,7 +97,7 @@ export default function CertificatePage() {
     try {
       const html2canvas = (await import("html2canvas")).default;
       const element = certificateRef.current;
-      const filename = `Certificado_${formData.name.replace(/\s+/g, "_")}.jpg`;
+      const filename = `Certificado_${formData.name.replace(/\s+/g, "_")}.png`;
 
       // Cria um iframe invisível completamente isolado
       const iframe = document.createElement("iframe");
@@ -204,14 +204,17 @@ export default function CertificatePage() {
       }
 
       // Usa escala alta para garantir qualidade
-      const scale = 3;
+      const scale = 5;
       const padding = 20; // Extra padding para garantir que bordas não sejam cortadas
 
       const canvas = await html2canvas(certificateElement as HTMLElement, {
         scale: scale,
         useCORS: true,
+        allowTaint: true,
         logging: false,
         backgroundColor: "#ffffff",
+        imageTimeout: 0,
+        removeContainer: true,
         width: (certificateElement as HTMLElement).scrollWidth + padding * 2,
         height: (certificateElement as HTMLElement).scrollHeight + padding * 2,
         windowWidth: (certificateElement as HTMLElement).scrollWidth + padding * 2,
@@ -235,6 +238,10 @@ export default function CertificatePage() {
         alert("Erro ao criar canvas final.");
         return;
       }
+
+      // Configura qualidade de renderização
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
 
       // Pinta tudo de branco primeiro
       ctx.fillStyle = "#FFFFFF";
@@ -260,7 +267,7 @@ export default function CertificatePage() {
           setShowSuccessMessage(true);
           setTimeout(() => setShowSuccessMessage(false), 3000);
         },
-        "image/jpeg",
+        "image/png",
         1.0
       );
     } catch (error) {
@@ -274,7 +281,7 @@ export default function CertificatePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
       <header className="bg-gradient-to-r px-4 py-2 shadow-md">
-        <nav className="mx-auto flex max-w-7xl items-center justify-end text-sm">
+        <nav className="mx-auto flex max-w-7xl items-center justify-center text-sm">
           <Image src="/escuta.svg" alt="Escuta Logo" width={80} height={20} className="h-5" />
         </nav>
       </header>
@@ -535,8 +542,8 @@ export default function CertificatePage() {
                 </div>
               )}
 
-              <section className="mt-8 overflow-x-auto rounded-lg bg-white p-4 shadow-2xl sm:p-8">
-                <div className="min-w-full">
+              <section className="mt-8 rounded-lg bg-white p-4 shadow-2xl sm:p-8">
+                <div className="w-full">
                   <div
                     style={{
                       width: "100%",
@@ -545,7 +552,7 @@ export default function CertificatePage() {
                       background: "#fff",
                       margin: "0 auto",
                       padding: "5%",
-                      border: "4px solid #398EA7",
+                      border: "3px solid #398EA7",
                       boxShadow: "inset 0 0 0 2px #398EA7, inset 0 0 0 8px #fff",
                       position: "relative",
                       fontFamily: "Arial, sans-serif",
@@ -695,13 +702,15 @@ export default function CertificatePage() {
                         gap: "clamp(10px, 2vw, 20px)",
                         marginTop: "clamp(20px, 4vw, 30px)",
                         flexWrap: "wrap",
+                        maxWidth: "100%",
+                        overflowX: "hidden",
                       }}>
                       <Image
                         src="/certificate/event/assets/logo-apollo.png"
                         alt="Apollo"
                         width={110}
                         height={70}
-                        style={{ maxHeight: "clamp(68px, 8vw,80px)", width: "auto" }}
+                        style={{ maxHeight: "clamp(68px, 8vw,80px)", width: "auto", maxWidth: "100%" }}
                       />
 
                       <Image
@@ -709,35 +718,35 @@ export default function CertificatePage() {
                         alt="Profcenter"
                         width={80}
                         height={42}
-                        style={{ maxHeight: "clamp(48px, 4.5vw, 42px)", width: "auto" }}
+                        style={{ maxHeight: "clamp(48px, 4.5vw, 42px)", width: "auto", maxWidth: "100%" }}
                       />
                       <Image
                         src="/certificate/event/assets/logo-inovares.png"
                         alt="Inovares"
                         width={65}
                         height={34}
-                        style={{ maxHeight: "clamp(38px, 4vw, 42px)", width: "auto" }}
+                        style={{ maxHeight: "clamp(38px, 4vw, 42px)", width: "auto", maxWidth: "100%" }}
                       />
                       <Image
                         src="/certificate/event/assets/logo-marca.png"
                         alt="Marca Brindes"
                         width={80}
                         height={42}
-                        style={{ maxHeight: "clamp(38px, 4.5vw, 42px)", width: "auto" }}
+                        style={{ maxHeight: "clamp(38px, 4.5vw, 42px)", width: "auto", maxWidth: "100%" }}
                       />
                       <Image
                         src="/certificate/event/assets/logo-mediarh.png"
                         alt="MediaRH"
                         width={80}
                         height={42}
-                        style={{ maxHeight: "clamp(38px, 4.5vw, 42px)", width: "auto" }}
+                        style={{ maxHeight: "clamp(38px, 4.5vw, 42px)", width: "auto", maxWidth: "100%" }}
                       />
                       <Image
                         src="/certificate/event/assets/logo-sicoob.png"
                         alt="Sicoob"
                         width={80}
                         height={42}
-                        style={{ maxHeight: "clamp(38px, 4.5vw, 42px)", width: "auto" }}
+                        style={{ maxHeight: "clamp(38px, 4.5vw, 42px)", width: "auto", maxWidth: "100%" }}
                       />
                     </div>
                   </div>
@@ -782,13 +791,12 @@ export default function CertificatePage() {
                     <Image
                       src="/certificate/event/assets/logo-evento.png"
                       alt="Logo do Evento"
-                      width={180}
+                      width={210}
                       height={120}
                       style={{
-                        height: "130px",
+                        height: "100px",
                         width: "auto",
-                        maxWidth: "180px",
-                        objectFit: "contain",
+                        maxWidth: "1680px",
                       }}
                     />
                   </div>
@@ -849,9 +857,8 @@ export default function CertificatePage() {
                     <span style={{ fontWeight: "bold" }}>
                       SUMMIT RH & ESG 2025 - INOVAÇÃO | PESSOAS | GESTÃO SUSTENTÁVEL
                     </span>
-                    , realizado pelo Centro de Indústrias do Estado de São Paulo - Regional Indaiatuba, em sua
-                    sede própria, representando a empresa{" "}
-                    <span style={{ fontWeight: "bold" }}>{formData.company}</span>.
+                    , realizado pelo Centro das Indústrias do Estado de São Paulo - Regional Indaiatuba,
+                    representando a empresa <span style={{ fontWeight: "bold" }}>{formData.company}</span>.
                   </p>
 
                   <p
@@ -889,7 +896,7 @@ export default function CertificatePage() {
                       style={{
                         borderTop: "2px solid #000",
                         width: "40%",
-                        margin: "-8px auto 0px",
+                        margin: "-12px auto 0px",
                       }}
                     />
                     <p style={{ margin: "8px 0 0 0", fontSize: "13px" }}>
