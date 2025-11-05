@@ -131,7 +131,7 @@ export default function CertificatePage() {
               min-height: 210mm;
             }
             #certificate-container {
-              padding: 20px;
+              padding: 0;
               overflow: visible !important;
             }
             #certificate-container > div {
@@ -205,7 +205,7 @@ export default function CertificatePage() {
 
       // Usa escala alta para garantir qualidade
       const scale = 5;
-      const padding = 20; // Extra padding para garantir que bordas não sejam cortadas
+      const borderWidth = 5; // Largura da borda do certificado
 
       const canvas = await html2canvas(certificateElement as HTMLElement, {
         scale: scale,
@@ -215,14 +215,14 @@ export default function CertificatePage() {
         backgroundColor: "#ffffff",
         imageTimeout: 0,
         removeContainer: true,
-        width: (certificateElement as HTMLElement).scrollWidth + padding * 2,
-        height: (certificateElement as HTMLElement).scrollHeight + padding * 2,
-        windowWidth: (certificateElement as HTMLElement).scrollWidth + padding * 2,
-        windowHeight: (certificateElement as HTMLElement).scrollHeight + padding * 2,
-        scrollX: -padding,
-        scrollY: -padding,
-        x: -padding,
-        y: -padding,
+        width: (certificateElement as HTMLElement).scrollWidth + borderWidth * 2,
+        height: (certificateElement as HTMLElement).scrollHeight + borderWidth * 2,
+        windowWidth: (certificateElement as HTMLElement).scrollWidth + borderWidth * 2,
+        windowHeight: (certificateElement as HTMLElement).scrollHeight + borderWidth * 2,
+        scrollX: 0,
+        scrollY: 0,
+        x: 0,
+        y: 0,
       });
 
       // Remove o iframe
@@ -552,7 +552,7 @@ export default function CertificatePage() {
                       background: "#fff",
                       margin: "0 auto",
                       padding: "5%",
-                      border: "3px solid #398EA7",
+                      border: "4px solid #398EA7",
                       boxShadow: "inset 0 0 0 2px #398EA7, inset 0 0 0 8px #fff",
                       position: "relative",
                       fontFamily: "Arial, sans-serif",
@@ -642,9 +642,8 @@ export default function CertificatePage() {
                       <span style={{ fontWeight: "bold" }}>
                         SUMMIT RH & ESG 2025 - INOVAÇÃO | PESSOAS | GESTÃO SUSTENTÁVEL
                       </span>
-                      , realizado pelo Centro de Indústrias do Estado de São Paulo - Regional Indaiatuba, em
-                      sua sede própria, representando a empresa{" "}
-                      <span style={{ fontWeight: "bold" }}>{formData.company}</span>.
+                      , realizado pelo Centro das Indústrias do Estado de São Paulo - Regional Indaiatuba,,
+                      representando a empresa <span style={{ fontWeight: "bold" }}>{formData.company}</span>.
                     </p>
 
                     <p
@@ -757,11 +756,11 @@ export default function CertificatePage() {
                 <div
                   ref={certificateRef}
                   style={{
-                    width: "297mm",
+                    width: "290mm",
                     height: "210mm",
                     background: "#ffffff",
                     margin: "0",
-                    padding: "30px 50px",
+                    padding: "30px 30px",
                     border: "6px solid #398EA7",
                     boxShadow: "inset 0 0 0 2px #398EA7, inset 0 0 0 8px #fff",
                     position: "relative",
