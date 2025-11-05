@@ -90,53 +90,181 @@ export default function CertificatePage() {
     setFormData(data);
   };
 
-  const generatePDF = async () => {
+  const generateImage = async () => {
     if (!certificateRef.current || !formData) return;
 
     setIsGenerating(true);
     try {
-      const html3pdf = (await import("html3pdf")).default;
+      const html2canvas = (await import("html2canvas")).default;
       const element = certificateRef.current;
-      const filename = `Certificado_${formData.name.replace(/\s+/g, "_")}.pdf`;
+      const filename = `Certificado_${formData.name.replace(/\s+/g, "_")}.jpg`;
 
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !("MSStream" in window);
-      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      // Cria um iframe invisível completamente isolado
+      const iframe = document.createElement("iframe");
+      iframe.style.position = "fixed";
+      iframe.style.left = "-99999px";
+      iframe.style.top = "0";
+      iframe.style.width = "297mm";
+      iframe.style.height = "210mm";
+      iframe.style.border = "none";
+      document.body.appendChild(iframe);
 
-      const pdfWorker = html3pdf()
-        .set({
-          margin: 0,
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            logging: false,
-            width: element.offsetWidth,
-            height: element.offsetHeight,
-          },
-          jsPDF: {
-            orientation: "landscape",
-            format: "a4",
-            compress: true,
-          },
-          pagebreak: { mode: "avoid-all" },
-        })
-        .from(element);
-
-      if (isIOS || isSafari) {
-        alert(
-          "O PDF será aberto em nova aba. Use o botão 'Compartilhar' para salvar ou imprimir o certificado."
-        );
-        const blob = await pdfWorker.output("blob");
-        const url = URL.createObjectURL(blob);
-        window.open(url, "_blank");
-        setTimeout(() => URL.revokeObjectURL(url), 60000);
-      } else {
-        await pdfWorker.save(filename);
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+      if (!iframeDoc) {
+        document.body.removeChild(iframe);
+        alert("Erro ao criar iframe. Por favor, tente novamente.");
+        return;
       }
 
-      setShowSuccessMessage(true);
-      setTimeout(() => setShowSuccessMessage(false), 3000);
+      // Escreve HTML limpo no iframe com fundo branco
+      iframeDoc.open();
+      iframeDoc.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            html, body {
+              background: #ffffff !important;
+              overflow: visible;
+              min-width: 297mm;
+              min-height: 210mm;
+            }
+            #certificate-container {
+              padding: 20px;
+              overflow: visible !important;
+            }
+            #certificate-container > div {
+              overflow: visible !important;
+            }
+          </style>
+        </head>
+        <body style="background: #ffffff !important;">
+          <div id="certificate-container"></div>
+        </body>
+        </html>
+      `);
+      iframeDoc.close();
+
+      // Clona o certificado para o iframe
+      const container = iframeDoc.getElementById("certificate-container");
+      if (container) {
+        const clonedElement = element.cloneNode(true) as HTMLElement;
+
+        // Converte Next.js Image components para img tags normais
+        const nextImages = clonedElement.querySelectorAll("img");
+        nextImages.forEach((img) => {
+          const newImg = iframeDoc.createElement("img");
+          newImg.src = img.src;
+          newImg.alt = img.alt;
+          newImg.width = img.width;
+          newImg.height = img.height;
+          // Copia os estilos inline
+          if (img.style.cssText) {
+            newImg.style.cssText = img.style.cssText;
+          }
+          img.parentNode?.replaceChild(newImg, img);
+        });
+
+        // Remove overflow hidden do clone
+        if (clonedElement instanceof HTMLElement) {
+          clonedElement.style.overflow = "visible";
+        }
+        container.appendChild(clonedElement);
+      }
+
+      // Aguarda renderização inicial
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      // Aguarda todas as imagens carregarem
+      const images = iframeDoc.getElementsByTagName("img");
+      const imagePromises = Array.from(images).map((img) => {
+        if (img.complete && img.naturalHeight !== 0) return Promise.resolve();
+        return new Promise((resolve) => {
+          img.onload = () => resolve(true);
+          img.onerror = () => {
+            console.warn("Erro ao carregar imagem:", img.src);
+            resolve(true);
+          };
+          // Timeout de segurança
+          setTimeout(() => resolve(true), 3000);
+        });
+      });
+      await Promise.all(imagePromises);
+
+      // Aguarda renderização adicional
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      // Captura apenas o certificado, não o body inteiro
+      const certificateElement = iframeDoc.querySelector("#certificate-container > div");
+      if (!certificateElement) {
+        document.body.removeChild(iframe);
+        alert("Erro ao localizar o certificado.");
+        return;
+      }
+
+      // Usa escala alta para garantir qualidade
+      const scale = 3;
+      const padding = 20; // Extra padding para garantir que bordas não sejam cortadas
+
+      const canvas = await html2canvas(certificateElement as HTMLElement, {
+        scale: scale,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+        width: (certificateElement as HTMLElement).scrollWidth + padding * 2,
+        height: (certificateElement as HTMLElement).scrollHeight + padding * 2,
+        windowWidth: (certificateElement as HTMLElement).scrollWidth + padding * 2,
+        windowHeight: (certificateElement as HTMLElement).scrollHeight + padding * 2,
+        scrollX: -padding,
+        scrollY: -padding,
+        x: -padding,
+        y: -padding,
+      });
+
+      // Remove o iframe
+      document.body.removeChild(iframe);
+
+      // Cria canvas final com fundo branco garantido
+      const finalCanvas = document.createElement("canvas");
+      finalCanvas.width = canvas.width;
+      finalCanvas.height = canvas.height;
+      const ctx = finalCanvas.getContext("2d", { alpha: false });
+
+      if (!ctx) {
+        alert("Erro ao criar canvas final.");
+        return;
+      }
+
+      // Pinta tudo de branco primeiro
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+      ctx.drawImage(canvas, 0, 0);
+
+      finalCanvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            alert("Erro ao gerar a imagem. Por favor, tente novamente.");
+            return;
+          }
+
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setTimeout(() => URL.revokeObjectURL(url), 100);
+
+          setShowSuccessMessage(true);
+          setTimeout(() => setShowSuccessMessage(false), 3000);
+        },
+        "image/jpeg",
+        1.0
+      );
     } catch (error) {
-      console.error("Erro ao gerar PDF:", error);
+      console.error("Erro ao gerar imagem:", error);
       alert("Erro ao gerar o certificado. Por favor, tente novamente.");
     } finally {
       setIsGenerating(false);
@@ -358,7 +486,7 @@ export default function CertificatePage() {
                 </button>
 
                 <button
-                  onClick={generatePDF}
+                  onClick={generateImage}
                   disabled={isGenerating}
                   className="inline-flex items-center gap-2 rounded-lg bg-[#E2377B] px-6 py-3 font-semibold text-white shadow-md transition-all duration-200 hover:bg-[#C92F6B] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50">
                   {isGenerating ? (
@@ -376,7 +504,7 @@ export default function CertificatePage() {
                           fill="currentColor"
                           d="M4 12v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                       </svg>
-                      Gerando PDF...
+                      Gerando imagem...
                     </>
                   ) : (
                     <>
@@ -385,10 +513,10 @@ export default function CertificatePage() {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                         />
                       </svg>
-                      Baixar PDF
+                      Baixar certificado
                     </>
                   )}
                 </button>
@@ -428,30 +556,41 @@ export default function CertificatePage() {
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
-                        marginBottom: "15px",
+                        marginBottom: "clamp(10px, 2vw, 15px)",
                       }}>
                       <Image
                         src="/certificate/event/assets/logo-ciesp.jpg"
                         alt="Logo CIESP"
                         width={120}
-                        height={85}
-                        style={{ height: "85px", width: "auto", maxWidth: "120px", objectFit: "contain" }}
+                        height={80}
+                        style={{
+                          height: "clamp(60px, 10vw, 80px)",
+                          width: "auto",
+                          maxWidth: "120px",
+                          objectFit: "contain",
+                        }}
                       />
                       <Image
                         src="/certificate/event/assets/logo-evento.png"
                         alt="Logo do Evento"
                         width={120}
-                        height={85}
-                        style={{ height: "85px", width: "auto", maxWidth: "120px", objectFit: "contain" }}
+                        height={80}
+                        style={{
+                          height: "clamp(60px, 10vw, 80px)",
+                          width: "auto",
+                          maxWidth: "120px",
+                          objectFit: "contain",
+                        }}
                       />
                     </div>
 
                     <h1
                       style={{
-                        fontSize: "clamp(24px, 5vw, 48px)",
+                        fontSize: "clamp(26px, 5vw, 48px)",
                         color: "#398EA7",
-                        letterSpacing: "0.3em",
-                        marginBottom: "0.5em",
+                        letterSpacing: "0.4em",
+                        marginBottom: "clamp(10px, 2vw, 15px)",
+                        marginTop: "clamp(8px, 1.5vw, 10px)",
                         textAlign: "center",
                         fontWeight: "bold",
                       }}>
@@ -460,8 +599,8 @@ export default function CertificatePage() {
 
                     <p
                       style={{
-                        fontSize: "clamp(20px, 4vw, 50px)",
-                        margin: "0.3em 0",
+                        fontSize: "clamp(22px, 4.5vw, 46px)",
+                        margin: "clamp(8px, 1.5vw, 12px) 0 clamp(6px, 1vw, 8px) 0",
                         fontWeight: "bold",
                         textAlign: "center",
                         color: "#000",
@@ -471,21 +610,21 @@ export default function CertificatePage() {
 
                     <p
                       style={{
-                        fontSize: "clamp(10px, 1.5vw, 16px)",
+                        fontSize: "clamp(11px, 1.6vw, 16px)",
                         color: "#333",
                         textAlign: "center",
-                        marginTop: "0.3em",
-                        marginBottom: "0.5em",
+                        marginTop: "0",
+                        marginBottom: "clamp(12px, 2vw, 18px)",
                       }}>
                       CPF: {formData.cpf}
                     </p>
 
                     <p
                       style={{
-                        fontSize: "clamp(10px, 1.8vw, 19px)",
-                        lineHeight: "1.7",
+                        fontSize: "clamp(11px, 1.8vw, 18px)",
+                        lineHeight: "1.6",
                         color: "#000",
-                        margin: "0.5em auto",
+                        margin: "clamp(8px, 1.5vw, 12px) auto",
                         textAlign: "center",
                       }}>
                       participou no dia{" "}
@@ -503,10 +642,10 @@ export default function CertificatePage() {
 
                     <p
                       style={{
-                        fontSize: "clamp(10px, 1.8vw, 19px)",
-                        lineHeight: "1.7",
+                        fontSize: "clamp(11px, 1.8vw, 18px)",
+                        lineHeight: "1.6",
                         color: "#000",
-                        margin: "0.5em auto 0",
+                        margin: "clamp(8px, 1.5vw, 12px) auto 0",
                         textAlign: "center",
                       }}>
                       Carga Horária: <span style={{ fontWeight: "bold" }}>{EVENT_HOURS} horas.</span>
@@ -514,8 +653,8 @@ export default function CertificatePage() {
 
                     <div
                       style={{
-                        marginTop: "clamp(20px, 5vw, 50px)",
-                        fontSize: "clamp(8px, 1.5vw, 15px)",
+                        marginTop: "clamp(25px, 5vw, 40px)",
+                        fontSize: "clamp(10px, 1.5vw, 15px)",
                         lineHeight: "1.4",
                         textAlign: "center",
                       }}>
@@ -525,9 +664,9 @@ export default function CertificatePage() {
                         width={150}
                         height={40}
                         style={{
-                          maxHeight: "clamp(35px, 8vw,30px)",
+                          maxHeight: "clamp(25px, 4vw, 35px)",
                           width: "auto",
-                          margin: "0 auto 0",
+                          margin: "0 auto clamp(-2px, -0.5vw, -1px)",
                           display: "block",
                         }}
                       />
@@ -535,11 +674,12 @@ export default function CertificatePage() {
                         style={{
                           borderTop: "2px solid #000",
                           width: "40%",
-                          margin: "-5px auto 0px",
+                          margin: "0 auto",
                         }}
                       />
-                      <p style={{ margin: "5px 0 0 0", fontSize: "clamp(8px, 1.3vw, 13px)" }}>
-                        <span style={{ fontWeight: "bold", fontSize: "clamp(9px, 1.5vw, 15px)" }}>
+                      <p
+                        style={{ margin: "clamp(6px, 1vw, 8px) 0 0 0", fontSize: "clamp(9px, 1.3vw, 13px)" }}>
+                        <span style={{ fontWeight: "bold", fontSize: "clamp(10px, 1.5vw, 15px)" }}>
                           Anita Moraes Parizzi Revolti
                         </span>
                         <br />
@@ -552,66 +692,66 @@ export default function CertificatePage() {
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
-                        gap: "clamp(8px, 2vw, 25px)",
-                        marginTop: "1em",
+                        gap: "clamp(10px, 2vw, 20px)",
+                        marginTop: "clamp(20px, 4vw, 30px)",
                         flexWrap: "wrap",
                       }}>
                       <Image
                         src="/certificate/event/assets/logo-apollo.png"
                         alt="Apollo"
-                        width={64}
-                        height={32}
-                        style={{ maxHeight: "clamp(16px, 3vw, 32px)", width: "auto" }}
+                        width={70}
+                        height={35}
+                        style={{ maxHeight: "clamp(20px, 4vw, 35px)", width: "auto" }}
                       />
                       <Image
                         src="/certificate/event/assets/logo-inovares.png"
                         alt="Inovares"
-                        width={64}
-                        height={32}
-                        style={{ maxHeight: "clamp(16px, 3vw, 32px)", width: "auto" }}
+                        width={70}
+                        height={35}
+                        style={{ maxHeight: "clamp(20px, 4vw, 35px)", width: "auto" }}
                       />
                       <Image
                         src="/certificate/event/assets/logo-profcenter.png"
                         alt="Profcenter"
-                        width={64}
-                        height={32}
-                        style={{ maxHeight: "clamp(16px, 3vw, 32px)", width: "auto" }}
+                        width={70}
+                        height={35}
+                        style={{ maxHeight: "clamp(20px, 4vw, 35px)", width: "auto" }}
                       />
                       <Image
                         src="/certificate/event/assets/logo-marca.png"
                         alt="Marca Brindes"
-                        width={64}
-                        height={32}
-                        style={{ maxHeight: "clamp(16px, 3vw, 32px)", width: "auto" }}
+                        width={70}
+                        height={35}
+                        style={{ maxHeight: "clamp(20px, 4vw, 35px)", width: "auto" }}
                       />
                       <Image
                         src="/certificate/event/assets/logo-mediarh.png"
                         alt="MediaRH"
-                        width={64}
-                        height={32}
-                        style={{ maxHeight: "clamp(16px, 3vw, 32px)", width: "auto" }}
+                        width={70}
+                        height={35}
+                        style={{ maxHeight: "clamp(20px, 4vw, 35px)", width: "auto" }}
                       />
                       <Image
                         src="/certificate/event/assets/logo-sicoob.png"
                         alt="Sicoob"
-                        width={64}
-                        height={32}
-                        style={{ maxHeight: "clamp(16px, 3vw, 32px)", width: "auto" }}
+                        width={70}
+                        height={35}
+                        style={{ maxHeight: "clamp(20px, 4vw, 35px)", width: "auto" }}
                       />
                     </div>
                   </div>
                 </div>
               </section>
 
-              <div style={{ position: "absolute", left: "-9999px", top: 0 }}>
+              <div style={{ position: "absolute", left: "-9999px", top: 0, background: "#fff" }}>
                 <div
                   ref={certificateRef}
                   style={{
                     width: "297mm",
                     height: "210mm",
-                    background: "#fff",
+                    background: "#ffffff",
                     margin: "0",
-                    padding: "25px 50px",
+                    padding: "30px 50px",
                     border: "6px solid #398EA7",
                     boxShadow: "inset 0 0 0 2px #398EA7, inset 0 0 0 8px #fff",
                     position: "relative",
@@ -624,29 +764,29 @@ export default function CertificatePage() {
                       display: "flex",
                       justifyContent: "space-between",
                       alignItems: "center",
-                      marginBottom: "3px",
+                      marginBottom: "15px",
                     }}>
                     <Image
                       src="/certificate/event/assets/logo-ciesp.jpg"
                       alt="Logo CIESP"
-                      width={110}
-                      height={75}
+                      width={120}
+                      height={80}
                       style={{
-                        height: "75px",
+                        height: "80px",
                         width: "auto",
-                        maxWidth: "110px",
+                        maxWidth: "120px",
                         objectFit: "contain",
                       }}
                     />
                     <Image
                       src="/certificate/event/assets/logo-evento.png"
                       alt="Logo do Evento"
-                      width={110}
-                      height={75}
+                      width={120}
+                      height={80}
                       style={{
-                        height: "75px",
+                        height: "80px",
                         width: "auto",
-                        maxWidth: "110px",
+                        maxWidth: "120px",
                         objectFit: "contain",
                       }}
                     />
@@ -654,10 +794,11 @@ export default function CertificatePage() {
 
                   <h1
                     style={{
-                      fontSize: "45px",
+                      fontSize: "48px",
                       color: "#398EA7",
-                      letterSpacing: "8px",
-                      marginBottom: "8px",
+                      letterSpacing: "10px",
+                      marginBottom: "15px",
+                      marginTop: "10px",
                       textAlign: "center",
                       fontWeight: "bold",
                     }}>
@@ -667,7 +808,7 @@ export default function CertificatePage() {
                   <p
                     style={{
                       fontSize: "46px",
-                      margin: "6px 0",
+                      margin: "12px 0 8px 0",
                       fontWeight: "bold",
                       textAlign: "center",
                       color: "#000",
@@ -680,8 +821,8 @@ export default function CertificatePage() {
                       fontSize: "16px",
                       color: "#333",
                       textAlign: "center",
-                      marginTop: "3px",
-                      marginBottom: "10px",
+                      marginTop: "0",
+                      marginBottom: "18px",
                     }}>
                     CPF: {formData.cpf}
                   </p>
@@ -689,9 +830,9 @@ export default function CertificatePage() {
                   <p
                     style={{
                       fontSize: "18px",
-                      lineHeight: "1.5",
+                      lineHeight: "1.6",
                       color: "#000",
-                      margin: "8px auto",
+                      margin: "12px auto",
                       maxWidth: "900px",
                       textAlign: "center",
                     }}>
@@ -715,9 +856,9 @@ export default function CertificatePage() {
                   <p
                     style={{
                       fontSize: "18px",
-                      lineHeight: "1.5",
+                      lineHeight: "1.6",
                       color: "#000",
-                      margin: "8px auto 0",
+                      margin: "12px auto 0",
                       maxWidth: "900px",
                       textAlign: "center",
                     }}>
@@ -726,7 +867,7 @@ export default function CertificatePage() {
 
                   <div
                     style={{
-                      marginTop: "35px",
+                      marginTop: "40px",
                       fontSize: "15px",
                       lineHeight: "1.4",
                       textAlign: "center",
@@ -737,9 +878,9 @@ export default function CertificatePage() {
                       width={150}
                       height={40}
                       style={{
-                        maxHeight: "32px",
+                        maxHeight: "35px",
                         width: "auto",
-                        margin: "5px auto 0",
+                        margin: "0 auto",
                         display: "block",
                       }}
                     />
@@ -747,10 +888,10 @@ export default function CertificatePage() {
                       style={{
                         borderTop: "2px solid #000",
                         width: "40%",
-                        margin: "-12px auto 0px",
+                        margin: "-8px auto 0px",
                       }}
                     />
-                    <p style={{ margin: "5px 0 0 0", fontSize: "13px" }}>
+                    <p style={{ margin: "8px 0 0 0", fontSize: "13px" }}>
                       <span style={{ fontWeight: "bold", fontSize: "15px" }}>
                         Anita Moraes Parizzi Revolti
                       </span>
@@ -764,51 +905,51 @@ export default function CertificatePage() {
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
-                      gap: "25px",
-                      marginTop: "25px",
+                      gap: "20px",
+                      marginTop: "30px",
                       flexWrap: "wrap",
                     }}>
                     <Image
                       src="/certificate/event/assets/logo-apollo.png"
                       alt="Apollo"
-                      width={65}
-                      height={33}
-                      style={{ maxHeight: "33px", width: "auto", margin: "0 12px" }}
+                      width={70}
+                      height={35}
+                      style={{ maxHeight: "35px", width: "auto" }}
                     />
                     <Image
                       src="/certificate/event/assets/logo-inovares.png"
                       alt="Inovares"
-                      width={65}
-                      height={33}
-                      style={{ maxHeight: "33px", width: "auto", margin: "0 12px" }}
+                      width={70}
+                      height={35}
+                      style={{ maxHeight: "35px", width: "auto" }}
                     />
                     <Image
                       src="/certificate/event/assets/logo-profcenter.png"
                       alt="Profcenter"
-                      width={65}
-                      height={33}
-                      style={{ maxHeight: "33px", width: "auto", margin: "0 12px" }}
+                      width={70}
+                      height={35}
+                      style={{ maxHeight: "35px", width: "auto" }}
                     />
                     <Image
                       src="/certificate/event/assets/logo-marca.png"
                       alt="Marca Brindes"
-                      width={65}
-                      height={33}
-                      style={{ maxHeight: "33px", width: "auto", margin: "0 12px" }}
+                      width={70}
+                      height={35}
+                      style={{ maxHeight: "35px", width: "auto" }}
                     />
                     <Image
                       src="/certificate/event/assets/logo-mediarh.png"
                       alt="MediaRH"
-                      width={65}
-                      height={33}
-                      style={{ maxHeight: "33px", width: "auto", margin: "0 12px" }}
+                      width={70}
+                      height={35}
+                      style={{ maxHeight: "35px", width: "auto" }}
                     />
                     <Image
                       src="/certificate/event/assets/logo-sicoob.png"
                       alt="Sicoob"
-                      width={65}
-                      height={33}
-                      style={{ maxHeight: "33px", width: "auto", margin: "0 12px" }}
+                      width={70}
+                      height={35}
+                      style={{ maxHeight: "35px", width: "auto" }}
                     />
                   </div>
                 </div>
