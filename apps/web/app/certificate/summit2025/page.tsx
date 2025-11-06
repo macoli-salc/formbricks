@@ -642,7 +642,7 @@ export default function CertificatePage() {
                       <span style={{ fontWeight: "bold" }}>
                         SUMMIT RH & ESG 2025 - INOVAÇÃO | PESSOAS | GESTÃO SUSTENTÁVEL
                       </span>
-                      , realizado pelo Centro das Indústrias do Estado de São Paulo - Regional Indaiatuba,,
+                      , realizado pelo Centro das Indústrias do Estado de São Paulo - Regional Indaiatuba,
                       representando a empresa <span style={{ fontWeight: "bold" }}>{formData.company}</span>.
                     </p>
 
